@@ -1,3 +1,5 @@
+# Creates users and databases for production and development for AirBnb Clone.
+
 # Create user airbnb_user_dev that can access the database from any IP and
 # user airbnb_user_prod that can access the database from only localhost.
 CREATE USER 'airbnb_user_dev'@'%' IDENTIFIED BY 'airbnb_user_dev';
