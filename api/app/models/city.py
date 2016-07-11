@@ -1,3 +1,7 @@
+from base import *
+from peewee import *
+
+
 class City(BaseModel):
     '''Define a City class for the city table of the database. Has a
     foreign key from the state table.

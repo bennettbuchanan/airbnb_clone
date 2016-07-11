@@ -8,17 +8,12 @@ import datetime
 from .. import config
 
 
-'''Fetch the database values and store them as a list.'''
-env = os.environ.get('DATABASE')
-env = json.loads(env)
-
-
 '''Create the SQLite database based on appropriate ENV variables.'''
-db = MySQLDatabase(env.get("database"),
-                   host=env.get("host"),
-                   port=env.get("port"),
-                   user=env.get("user"),
-                   passwd=env.get("password"))
+db = MySQLDatabase(config.DATABASE.get("database"),
+                   host=config.DATABASE.get("host"),
+                   port=config.DATABASE.get("port"),
+                   user=config.DATABASE.get("user"),
+                   passwd=config.DATABASE.get("password"))
 
 
 class BaseModel(Model):

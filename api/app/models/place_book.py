@@ -1,3 +1,7 @@
+from base import *
+from peewee import *
+
+
 class PlaceBook(BaseModel):
     place = ForeignKeyField(Place)
     user = ForeignKeyField(User, related_name='placesbooked')
