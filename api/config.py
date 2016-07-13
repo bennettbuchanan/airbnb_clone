@@ -26,4 +26,5 @@ if status == "production":
                 "user": "airbnb_user_prod",
                 "database": "airbnb_prod",
                 "port": 3306,
-                "charset": "utf8", "password": "airbnb_user_prod"}
+                "charset": "utf8",
+                "password": "airbnb_user_prod"}

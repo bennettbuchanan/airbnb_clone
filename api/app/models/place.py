@@ -1,5 +1,7 @@
 from base import *
 from peewee import *
+from user import User
+from city import City
 
 
 class Place(BaseModel):

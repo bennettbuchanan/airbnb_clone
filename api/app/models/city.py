@@ -1,4 +1,5 @@
 from base import *
+from state import State
 from peewee import *
 
 
