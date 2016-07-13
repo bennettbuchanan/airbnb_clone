@@ -1,3 +1,6 @@
+'''Imports BaseModel and defines a State class that inherits from BaseModel
+class.
+'''
 from base import *
 from peewee import *
 

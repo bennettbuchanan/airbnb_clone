@@ -1,9 +1,7 @@
-#!/usr/bin/env python
-
-'''Configures the environment variables for AirBnb clone based on the current
-value of the env varibale AIRBNB_ENV. The default mode is 'development'.
+'''Configures the variables for Airbnb clone based on the current value of the
+environment variable AIRBNB_ENV. The default mode is that of user
+'airbnb_user_dev'.
 '''
-
 import os
 
 status = os.environ.get('AIRBNB_ENV')

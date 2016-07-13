@@ -1,3 +1,6 @@
+'''Imports BaseModel, Place, and User classes and defines a PlaceBook class
+that inherits from BaseModel class.
+'''
 from base import *
 from peewee import *
 from place import Place

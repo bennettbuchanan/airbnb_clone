@@ -1,5 +1,6 @@
 '''Sets MySQL variable database with all configuration settings from the right
-config file depending on the environment.
+config file depending on the environment.For more information regarding the
+peewee Model see: http://docs.peewee-orm.com/en/latest/peewee/models.html.
 '''
 from peewee import *
 import os

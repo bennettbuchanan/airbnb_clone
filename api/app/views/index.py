@@ -1,3 +1,7 @@
+'''Defines the flask function to run when a GET request is made to the root
+directory '/'. Handles the behavior for a 404 error.
+'''
+
 from flask import Flask, jsonify, request
 from flask_json import FlaskJSON, JsonError, json_response, as_json
 from app import app

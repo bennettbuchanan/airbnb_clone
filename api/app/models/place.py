@@ -1,3 +1,6 @@
+'''Imports BaseModel, User, and City classes and defines a Place class that
+inherits from BaseModel class.
+'''
 from base import *
 from peewee import *
 from user import User

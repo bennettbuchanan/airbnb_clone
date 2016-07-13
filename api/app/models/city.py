@@ -1,3 +1,6 @@
+'''Imports BaseModel and State classes and defines a City class that inherits
+from BaseModel class.
+'''
 from base import *
 from state import State
 from peewee import *
