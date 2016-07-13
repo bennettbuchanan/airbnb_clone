@@ -1,5 +1,4 @@
 # Airbnb Application Clone
-### In development
 
 This project uses the following technologies:
 * React
@@ -14,3 +13,5 @@ This project uses the following technologies:
 * OAuth2
 * MySQL
 * NoSQL
+
+###### Currently in development.
