@@ -30,12 +30,9 @@ class User(BaseModel):
         '''Returns a hash of all the model's data.'''
         data = {}
         data['id'] = self.id
-        data['created_at'] = self.created_at
-        data['updated_at'] = self.updated_at
+        data['created_at'] = str(self.created_at)
+        data['updated_at'] = str(self.updated_at)
         data['email'] = self.email
         data['first_name'] = self.first_name
         data['last_name'] = self.last_name
-        data['is_admin'] = self.is_admin
-        json_data = json.dumps(data, sort_keys=True,
-                               indent=4, separators=(',', ': '))
-        return json_data
+        return data
