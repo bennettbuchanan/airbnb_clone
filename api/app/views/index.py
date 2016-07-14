@@ -10,7 +10,7 @@ from app.models.base import BaseModel
 from peewee import *
 
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/', methods=['GET'])
 @as_json
 def index():
     '''Return a JSON object with the status code of the server, and UTC time
