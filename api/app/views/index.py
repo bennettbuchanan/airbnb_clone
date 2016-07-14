@@ -1,16 +1,16 @@
 '''Defines the flask function to run when a GET request is made to the root
 directory '/'. Handles the behavior for a 404 error.
 '''
-
 from flask import Flask, jsonify, request
 from flask_json import FlaskJSON, JsonError, json_response, as_json
 from app import app
 import datetime
 import time
 from app.models.base import BaseModel
+from peewee import *
 
 
-@app.route('/', methods=['GET'])
+@app.route('/', methods=['GET', 'POST'])
 @as_json
 def index():
     '''Return a JSON object with the status code of the server, and UTC time

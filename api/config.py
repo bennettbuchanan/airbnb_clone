@@ -8,7 +8,7 @@ status = os.environ.get('AIRBNB_ENV')
 
 DEBUG = True
 HOST = "localhost"
-PORT = 3017
+PORT = 3022
 DATABASE = {"host": "158.69.92.186",
             "user": "airbnb_user_dev",
             "database": "airbnb_dev",

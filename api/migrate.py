@@ -1,5 +1,5 @@
 '''Import peewee models from their respective folders and create the tables in
-the database. In addition to accessind BaseModel class, the importing of base
+the database. In addition to accessing BaseModel class, the importing of base
 is required moreover for base.py to access the variables set up in config.py.
 '''
 from app.models.user import User

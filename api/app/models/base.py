@@ -1,5 +1,5 @@
 '''Sets MySQL variable database with all configuration settings from the right
-config file depending on the environment.For more information regarding the
+config file depending on the environment. For more information regarding the
 peewee Model see: http://docs.peewee-orm.com/en/latest/peewee/models.html.
 '''
 from peewee import *
@@ -9,7 +9,9 @@ import datetime
 from config import *
 
 
-'''Create the SQLite database based on appropriate ENV variables.'''
+'''Create the MySQLDatabase database based on appropriate environmnent
+variable.
+'''
 db = MySQLDatabase(DATABASE.get("database"),
                    host=DATABASE.get("host"),
                    port=DATABASE.get("port"),
@@ -23,10 +25,10 @@ class BaseModel(Model):
     database = db
     created_at = DateTimeField(default=datetime.datetime
                                                .now()
-                                               .strftime("%m/%d/%Y %H:%M:%S"))
+                                               .strftime("%Y/%m/%d %H:%M:%S"))
     updated_at = DateTimeField(default=datetime.datetime
                                                .now()
-                                               .strftime("%m/%Y %H:%M:%S"))
+                                               .strftime("%Y/%m/%d %H:%M:%S"))
 
     def save(self, *args, **kwargs):
         '''Overloading operator save that updates the current datetime before
@@ -39,6 +41,8 @@ class BaseModel(Model):
         self.updated_at = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
 
     class Meta:
-        '''Define the database from which this class is created.'''
+        '''Meta configuration is passed on to subclasses. Define the database
+        from which this class is created. Specify a default ordering by id.
+        '''
         database = db
         order_by = ('id', )

@@ -19,3 +19,22 @@ class Place(BaseModel):
     price_by_night = IntegerField(default=0)
     latitude = FloatField()
     longitude = FloatField()
+
+    def to_hash(self):
+        '''Returns a hash of all the model's data.'''
+        data = {}
+        data['id'] = self.id
+        data['created_at'] = self.created_at
+        data['updated_at'] = self.updated_at
+        data['owner_id'] = self.owner.id
+        data['city_id'] = self.city.id
+        data['name'] = self.name
+        data['description'] = self.description
+        data['number_rooms'] = self.number_rooms
+        data['number_bathrooms'] = self.number_bathrooms
+        data['max_guest'] = self.max_guest
+        data['price_by_night'] = self.price_by_night
+        data['latitude'] = self.latitude
+        data['longitude'] = self.longitude
+        json_data = json.dumps(data)
+        return json_data
