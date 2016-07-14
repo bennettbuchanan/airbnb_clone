@@ -26,6 +26,7 @@ def handle_books(place_id):
         books = json.dumps(arr)
         return books
 
+
 @app.route('/places/<int:place_id>/books/<int:book_id>', methods=['GET', 'PUT', 'DELETE'])
 def handle_books_id(place_id, book_id):
     arr = []

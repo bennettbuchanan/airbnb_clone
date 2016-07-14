@@ -22,7 +22,7 @@ def handle_users():
     else:
         arr = []
         for user in User.select():
-            arr.append(model_to_dict(user, exclude=[User.created_at, User.updated_at]))
+            arr.append(model_to_dict(user, exclude=[User.created_at, User.updated_at, User.password]))
         test = json.dumps(arr)
         return test
 

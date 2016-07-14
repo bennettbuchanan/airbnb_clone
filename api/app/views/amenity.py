@@ -9,7 +9,7 @@ import json
 
 
 @app.route('/amenities', methods=['GET', 'POST'])
-def handle_amenity(amenity_id):
+def handle_amenity():
     if request.method == 'POST':
         for place_book in Amenity.select():
             if str(request.form['name']) == place_book.name:

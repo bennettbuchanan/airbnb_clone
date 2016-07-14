@@ -7,7 +7,7 @@ from app.models.base import db
 import json
 
 @app.route('/places', methods=['GET', 'POST'])
-def handle_places(state_id):
+def handle_places():
     if request.method == 'POST':
         for place in Place.select():
             if str(request.form['name']) == place.name:
@@ -90,18 +90,3 @@ def handle_place_city_id(state_id, place_id):
                              latitude=request.form['latitude'],
                              longitude=request.form['longitude'])
         return place.to_hash()
-
-
-# def handle_place_id(state_id, place_id):
-#     arr = []
-#     for place in Place.select():
-#         if str(place_id) == str(place.id):
-#             this_place = place
-#     if request.method == 'GET':
-#         arr.append(model_to_dict(this_place, exclude=[Place.created_at, Place.updated_at]))
-#         return json.dumps(arr)
-#
-#     elif request.method == 'DELETE':
-#         q = Place.delete().where(Place.id == place_id)
-#         q.execute()
-#         return "deleted"
