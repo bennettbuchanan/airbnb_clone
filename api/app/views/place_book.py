@@ -1,59 +1,62 @@
-from flask import Flask
-from flask import request, make_response, jsonify
-from playhouse.shortcuts import model_to_dict, dict_to_model
+from flask import Flask, request, make_response, jsonify
 from app.models.place_book import PlaceBook
 from app import app
-from app.models.base import db
-import json
+import time
 
 
 @app.route('/places/<int:place_id>/books', methods=['GET', 'POST'])
 def handle_books(place_id):
-    if request.method == 'POST':
-        for place_book in PlaceBook.select():
-            if str(request.form['name']) == place_book.name:
-                return make_response(jsonify(code=10002,
-                                             msg="PlaceBook already exists in this state"), 409)
-        place_book = PlaceBook.create(place=request.form['place'],
-                                      is_validated=request.form['is_validated'],
-                                      date_start=request.form['date_start'],
-                                      number_nights=request.form['number_nights'])
-        return place_book.to_hash()
-    else:
-        arr = []
-        for place_book in PlaceBook.select().where(PlaceBook.id == place_id):
-            arr.append(model_to_dict(place_book, exclude=[PlaceBook.created_at, PlaceBook.updated_at]))
-        books = json.dumps(arr)
-        return books
-
-
-@app.route('/places/<int:place_id>/books/<int:book_id>', methods=['GET', 'PUT', 'DELETE'])
-def handle_books_id(place_id, book_id):
-    arr = []
-    for book in PlaceBook.select():
-        if str(book_id) == str(book.id):
-            this_book = book
     if request.method == 'GET':
-        arr.append(model_to_dict(this_book, exclude=[PlaceBook.created_at, PlaceBook.updated_at]))
-        return json.dumps(arr)
+        arr = []
+        for book in PlaceBook.select().where(PlaceBook.place == place_id).iterator():
+            arr.append(book.to_hash())
+        return jsonify(arr), 200
+
+    elif request.method == 'POST':
+        params = request.values
+        book = PlaceBook()
+        for key in params:
+            if key == 'date_start':
+                try:
+                    time.strptime(params.get(key), "%Y/%m/%d %H:%M:%S")
+                    setattr(book, key, params.get(key))
+                except ValueError:
+                    raise ValueError("Incorrect time format, should be " +
+                                     "yyyy/MM/dd HH:mm:ss")
+            else:
+                setattr(book, key, params.get(key))
+        book.place = place_id
+        book.save()
+        return jsonify(book.to_hash()), 200
+
+
+@app.route('/places/<int:place_id>/books/<int:book_id>',
+           methods=['GET', 'PUT', 'DELETE'])
+def handle_books_id(place_id, book_id):
+    try:
+        book = PlaceBook.select().where(PlaceBook.id == book_id).get()
+    except PlaceBook.DoesNotExist:
+        raise Exception("There is no placebook with this id.")
+        
+    if request.method == 'GET':
+        return jsonify(book.to_hash()), 200
 
     elif request.method == 'PUT':
-        params = dict([p.split('=') for p in request.get_data().split('&')])
+        params = request.values
         for key in params:
-            if str(key) == 'place':
-                this_user.place = params.get(key)
-            if str(key) == 'user':
-                this_user.user = params.get(key)
-            if str(key) == 'is_validated':
-                this_user.is_validated = params.get(key)
-            if str(key) == 'date_start':
-                this_user.date_start = params.get(key)
-            if str(key) == 'number_nights':
-                this_user.number_nights = params.get(key)
-            this_user.save()
-        return "user changed"
+            if key == 'user':
+                raise Exception("You may not change the user.")
+            else:
+                setattr(book, key, params.get(key))
+        book.save()
+        return make_response(jsonify(msg="Place book information updated " +
+                                     "successfully."), 200)
 
     elif request.method == 'DELETE':
-        q = PlaceBook.delete().where(PlaceBook.id == book_id)
-        q.execute()
-        return "deleted"
+        try:
+            book = PlaceBook.delete().where(PlaceBook.id == book_id)
+        except PlaceBook.DoesNotExist:
+            raise Exception("There is no place with this id.")
+        book.execute()
+        return make_response(jsonify(msg="Place book deleted successfully."),
+                             200)

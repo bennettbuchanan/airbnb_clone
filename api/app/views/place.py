@@ -30,7 +30,7 @@ def handle_places():
 def handle_place_id(place_id):
     '''Select the place with the id from the database and store as the variable
     `place`. Return that place's hash with a GET request method. Update the
-    attributes, excepting  `owner` and `city` of the place with Put request
+    attributes, excepting  `owner` and `city` of the place with PUT request
     method.  Remove the the place with this id from the database with a DELETE
     request method.
 
