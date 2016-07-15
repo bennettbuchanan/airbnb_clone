@@ -5,7 +5,7 @@ peewee Model see: http://docs.peewee-orm.com/en/latest/peewee/models.html.
 from peewee import *
 import os
 import json
-import datetime
+from datetime import datetime
 from config import *
 
 
@@ -22,14 +22,10 @@ db = MySQLDatabase(DATABASE['database'],
 
 class BaseModel(Model):
     '''A BaseModel class for other tables to inherit from.'''
-    id = PrimaryKeyField(primary_key=True, unique=True)
     database = db
-    created_at = DateTimeField(default=datetime.datetime
-                                               .now()
-                                               .strftime("%Y/%m/%d %H:%M:%S"))
-    updated_at = DateTimeField(default=datetime.datetime
-                                               .now()
-                                               .strftime("%Y/%m/%d %H:%M:%S"))
+    id = PrimaryKeyField(primary_key=True, unique=True)
+    created_at = DateTimeField(default=datetime.now())
+    updated_at = DateTimeField(default=datetime.now())
 
     def save(self, *args, **kwargs):
         '''Overloading operator save that updates the current datetime before
@@ -40,8 +36,18 @@ class BaseModel(Model):
         args -- A non-keyworded argument list.
         kwards -- A dict of keyword arguments passed to the function.
         '''
-        self.updated_at = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+        self.updated_at = datetime.now()
         Model.save(self)
+
+    def base_to_hash(self):
+        '''Stores the BaseModel data in a hash to be used with other model's
+        data.
+        '''
+        data = {}
+        data['id'] = self.id
+        data['created_at'] = self.created_at.strftime("%Y/%m/%d %H:%M:%S")
+        data['updated_at'] = self.updated_at.strftime("%Y/%m/%d %H:%M:%S")
+        return data
 
     class Meta:
         '''Meta configuration is passed on to subclasses. Define the database

@@ -1,40 +1,56 @@
-from flask import Flask
-from flask import request, make_response, jsonify
-from playhouse.shortcuts import model_to_dict, dict_to_model
+from flask import Flask, request, make_response, jsonify
 from app.models.state import State
 from app import app
-from app.models.base import db
-import json
 
 
 @app.route('/states', methods=['GET', 'POST'])
 def handle_states():
-    if request.method == 'POST':
-        for state in State.select():
-            if str(request.form['name']) == state.name:
-                return make_response(jsonify(code=10001,
-                                             msg="State already exists"), 409)
-        state = State.create(name=request.form['name'])
-        return state.to_hash()
-    else:
+    '''Returns all the states from the database as JSON objects with a GET
+    request, or adds a new state to the database with a POST request. Refer to
+    exception rules of peewee `get()` method for additional explanation of
+    how the POST request is handled:
+    http://docs.peewee-orm.com/en/latest/peewee/api.html#SelectQuery.get
+    '''
+    if request.method == 'GET':
         arr = []
         for state in State.select():
-            arr.append(model_to_dict(state, exclude=[State.created_at, State.updated_at]))
-        states = json.dumps(arr)
-        return states
+            arr.append(state.to_hash())
+        return jsonify(arr), 200
+
+    elif request.method == 'POST':
+        params = request.values
+        try:
+            State.select().where(State.name == request.form['name']).get()
+            return make_response(jsonify(code=10001,
+                                         msg="State already exists"), 409)
+        except State.DoesNotExist:
+            state = State.create(name=request.form['name'])
+            return jsonify(state.to_hash()), 200
 
 
 @app.route('/states/<int:state_id>', methods=['GET', 'DELETE'])
 def handle_state_id(state_id):
-    arr = []
-    for state in State.select():
-        if str(state_id) == str(state.id):
-            this_state = state
+    '''Select the state with the id from the database and store as the variable
+    `state` with a GET request method. Update the data of the particular state
+    with a PUT request method. This will take the parameters passed and update
+    only those values. Remove the state with this id from the database with
+    a DELETE request method.
+
+    Keyword arguments:
+    state_id: The id of the state from the database.
+    '''
+    try:
+        state = State.select().where(State.id == state_id).get()
+    except State.DoesNotExist:
+        raise Exception("There is no state with this id.")
+
     if request.method == 'GET':
-        arr.append(model_to_dict(this_state, exclude=[State.created_at, State.updated_at]))
-        return json.dumps(arr)
+        return jsonify(state.to_hash()), 200
 
     elif request.method == 'DELETE':
-        q = State.delete().where(State.id == state_id)
-        q.execute()
-        return "deleted"
+        try:
+            state = State.delete().where(State.id == state_id)
+        except State.DoesNotExist:
+            raise Exception("There is no state with this id.")
+        state.execute()
+        return make_response(jsonify(msg="State deleted successfully."), 200)

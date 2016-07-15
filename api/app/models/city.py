@@ -14,12 +14,10 @@ class City(BaseModel):
     state = ForeignKeyField(State, related_name='cities', on_delete='CASCADE')
 
     def to_hash(self):
-        '''Returns a hash of all the model's data.'''
+        '''Returns the BaseModel data, along with this model model's data as a
+        hash.
+        '''
         data = {}
-        data['id'] = self.id
-        data['created_at'] = self.created_at
-        data['updated_at'] = self.updated_at
-        data['name'] = self.name
+        data['name'] = self.city
         data['state_id'] = self.state.id
-        json_data = json.dumps(data)
-        return json_data
+        return dict(self.base_to_hash().items() + data.items())

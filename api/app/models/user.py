@@ -10,8 +10,7 @@ import json
 
 class User(BaseModel):
     '''Define a User class for the user table of the database.'''
-    '''update email field to , unique=True'''
-    email = CharField(128, null=False)
+    email = CharField(128, null=False, unique=True)
     password = CharField(128, null=False)
     first_name = CharField(128, null=False)
     last_name = CharField(128, null=False)
@@ -27,12 +26,11 @@ class User(BaseModel):
         self.password = md5.new(clear_password).digest()
 
     def to_hash(self):
-        '''Returns a hash of all the model's data.'''
+        '''Returns the BaseModel data, along with this model model's data as a
+        hash.
+        '''
         data = {}
-        data['id'] = self.id
-        data['created_at'] = str(self.created_at)
-        data['updated_at'] = str(self.updated_at)
         data['email'] = self.email
         data['first_name'] = self.first_name
         data['last_name'] = self.last_name
-        return data
+        return dict(self.base_to_hash().items() + data.items())

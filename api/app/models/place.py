@@ -21,11 +21,10 @@ class Place(BaseModel):
     longitude = FloatField()
 
     def to_hash(self):
-        '''Returns a hash of all the model's data.'''
+        '''Returns the BaseModel data, along with this model model's data as a
+        hash.
+        '''
         data = {}
-        data['id'] = self.id
-        data['created_at'] = self.created_at
-        data['updated_at'] = self.updated_at
         data['owner_id'] = self.owner.id
         data['city_id'] = self.city.id
         data['name'] = self.name
@@ -36,5 +35,4 @@ class Place(BaseModel):
         data['price_by_night'] = self.price_by_night
         data['latitude'] = self.latitude
         data['longitude'] = self.longitude
-        json_data = json.dumps(data)
-        return json_data
+        return dict(self.base_to_hash().items() + data.items())

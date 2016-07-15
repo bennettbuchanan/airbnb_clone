@@ -15,20 +15,20 @@ def handle_users():
         arr = []
         for user in User.select():
             arr.append(user.to_hash())
-        return jsonify(arr)
+        return jsonify(arr), 200
 
     elif request.method == 'POST':
-        params = request.values
         try:
             User.select().where(User.email == request.form['email']).get()
             return make_response(jsonify(code=10000,
                                          msg="Email already exists"), 409)
         except User.DoesNotExist:
-            user = User.create(first_name=request.form['first_name'],
-                               last_name=request.form['last_name'],
-                               email=request.form['email'],
-                               password=request.form['password'])
-            return jsonify(user.to_hash())
+            params = request.values
+            user = User()
+            for key in params:
+                setattr(user, key, params.get(key))
+            user.save()
+            return jsonify(user.to_hash()), 200
 
 
 @app.route('/users/<int:user_id>', methods=['GET', 'PUT', 'DELETE'])
