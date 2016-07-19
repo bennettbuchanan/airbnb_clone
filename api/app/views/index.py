@@ -19,11 +19,10 @@ def index():
     return jsonify(status="OK",
                    utc_time=datetime.datetime
                                     .utcnow()
-                                    .strftime("%m/%d/%Y %H:%M:%S"),
+                                    .strftime("%Y/%m/%d %H:%M:%S"),
                    time=datetime.datetime
                                 .now()
-                                .strftime("%m/%d/%Y %H:%M:%S"))
-
+                                .strftime("%Y/%m/%d %H:%M:%S"))
 
 def before_request():
     '''Connect to the database defined in BaseModel.'''

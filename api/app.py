@@ -1,7 +1,7 @@
 '''Defines the run method of the Flask application. Registers the functions
 `before_request()` and `after_request()` to run before and after each request,
 respectively (both functions located in app/views/index). Essentially, these
-function open and close a connection to the MySQL database with each request
+functions open and close a connection to the MySQL database with each request
 made to the server.
 '''
 from flask import Flask
