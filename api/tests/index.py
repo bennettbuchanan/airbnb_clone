@@ -1,7 +1,7 @@
 import unittest
 import json
-from datetime import datetime
 import time
+from datetime import datetime
 from app import app
 from app.views import index
 
@@ -9,7 +9,9 @@ from app.views import index
 class FlaskrTestCase(unittest.TestCase):
 
     def setUp(self):
-        '''Creates a test client.'''
+        '''Creates a test client and propagates the exceptions to the test
+        client.
+        '''
         self.app = app.test_client()
         self.app.testing = True
 
@@ -17,12 +19,12 @@ class FlaskrTestCase(unittest.TestCase):
         pass
 
     def test_200(self):
-        '''Tests that the root status_code is 200.'''
+        '''Tests that the status code response is is 200.'''
         res = self.app.get('/')
         self.assertEqual(res.status_code, 200)
 
     def test_status(self):
-        '''Tests that the response data status item is "OK".'''
+        '''Tests that the response data "status" == "OK".'''
         res = self.app.get('/')
         d = json.loads(res.data)
         self.assertEqual(d.get("status"), "OK")
@@ -32,8 +34,8 @@ class FlaskrTestCase(unittest.TestCase):
         difference.
 
         Keyword arguments:
-        t_type -- The time type method of the datetime object (i.e., the string
-        "now" for the method `datetime.now()`).
+        t_type -- The time type method of the datetime object (i.e., "now" for
+        when using the method `datetime.now()`).
         obj -- The object to get the particular time string from.
         el -- The string element to compare. Must have data up to the sec.
         '''
