@@ -22,14 +22,14 @@ def handle_city(state_id):
     elif request.method == 'POST':
         params = request.values
         try:
-            City.select().where((City.city == request.form['city']) &
+            City.select().where((City.name == request.form['name']) &
                                 (City.state == state_id)
                                 ).get()
             return make_response(jsonify(code=10002,
                                          msg="City already exists in this " +
                                          "state"), 409)
         except City.DoesNotExist:
-            city = City.create(city=request.form['city'], state=state_id)
+            city = City.create(name=request.form['name'], state=state_id)
             return jsonify(city.to_hash()), 200
 
 

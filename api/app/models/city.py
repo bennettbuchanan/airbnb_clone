@@ -10,7 +10,7 @@ class City(BaseModel):
     '''Define a City class for the city table of the database. Has a
     foreign key from the state table.
     '''
-    city = CharField(128, null=False)
+    name = CharField(128, null=False)
     state = ForeignKeyField(State, related_name='cities', on_delete='CASCADE')
 
     def to_hash(self):
@@ -18,6 +18,6 @@ class City(BaseModel):
         hash.
         '''
         data = {}
-        data['name'] = self.city
+        data['name'] = self.name
         data['state_id'] = self.state.id
         return dict(self.base_to_hash().items() + data.items())

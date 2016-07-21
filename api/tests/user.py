@@ -71,7 +71,7 @@ class FlaskTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 404)
 
     def test_delete(self):
-        '''Create a new user.'''
+        '''Create a new user. Confirm 201 status code.'''
         res = self.create_user("user_1", "user_1", "user_1", "user_1")
         self.assertEqual(res.status_code, 201)
 
