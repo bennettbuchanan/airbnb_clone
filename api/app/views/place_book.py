@@ -27,8 +27,9 @@ def handle_books(place_id):
                     time.strptime(params.get(key), "%Y/%m/%d %H:%M:%S")
                     setattr(book, key, params.get(key))
                 except ValueError:
-                    raise ValueError("Incorrect time format, should be " +
-                                     "yyyy/MM/dd HH:mm:ss")
+                    return make_response(jsonify(msg="Incorrect time format," +
+                                                 " should be " +
+                                                 "yyyy/MM/dd HH:mm:ss"), 409)
             else:
                 setattr(book, key, params.get(key))
         book.place = place_id
@@ -59,7 +60,8 @@ def handle_books_id(place_id, book_id):
         params = request.values
         for key in params:
             if key == 'user':
-                raise Exception("You may not change the user.")
+                return make_response(jsonify(msg="You may not change the " +
+                                             "user."), 409)
             else:
                 setattr(book, key, params.get(key))
         book.save()

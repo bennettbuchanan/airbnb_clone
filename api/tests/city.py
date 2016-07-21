@@ -18,16 +18,14 @@ class FlaskTestCase(unittest.TestCase):
         self.app = app.test_client()
         logging.disable(logging.CRITICAL)
         BaseModel.database.connect()
-        BaseModel.database.create_table(State)
-        BaseModel.database.create_table(City)
+        BaseModel.database.create_tables([State, City])
 
         '''Create a state for routing purposes.'''
         self.app.post('/states', data=dict(name="test"))
 
     def tearDown(self):
         '''Drops the state and city tables.'''
-        BaseModel.database.drop_table(City)
-        BaseModel.database.drop_table(State)
+        BaseModel.database.drop_tables([State, City])
 
     def create_city(self, city_name):
         '''Makes a post request with the parameters in dict. This adds a city
