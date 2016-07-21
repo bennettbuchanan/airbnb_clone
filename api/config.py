@@ -30,7 +30,7 @@ if status == "production":
 elif status == "test":
     DEBUG = False
     HOST = "localhost"
-    PORT = 5555
+    PORT = 5556
     DATABASE = {"host": "158.69.92.186",
                 "user": "airbnb_user_test",
                 "database": "airbnb_test",

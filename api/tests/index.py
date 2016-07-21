@@ -6,7 +6,7 @@ from app import app
 from app.views import index
 
 
-class FlaskrTestCase(unittest.TestCase):
+class FlaskTestCase(unittest.TestCase):
 
     def setUp(self):
         '''Creates a test client and propagates the exceptions to the test
