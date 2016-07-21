@@ -121,7 +121,7 @@ class FlaskTestCase(unittest.TestCase):
             res = self.create_placebook('/places/1/books',
                                         datetime.now().strftime("%Y/%m/%d %H:%M:%S"),
                                         'test_' + str(i))
-        '''Delete book with the id 2.'''
+        '''Delete book with the id 1.'''
         self.app.delete('/places/1/books/1')
 
         '''There is only one remaining booking in the table, that with id 2.'''

@@ -7,8 +7,8 @@ from app import app
 
 @app.route('/amenities', methods=['GET', 'POST'])
 def handle_amenity():
-    '''Returns all amenities as JSON objects in an array with a GET request. Adds
-    an amenity with a POST request.
+    '''Returns all amenities as JSON objects in an array with a GET request.
+    Adds an amenity with a POST request.
     '''
     if request.method == 'GET':
         arr = []
@@ -17,12 +17,17 @@ def handle_amenity():
         return jsonify(arr), 200
 
     elif request.method == 'POST':
-        params = request.values
-        amenity = Amenity()
-        for key in params:
-            setattr(amenity, key, params.get(key))
-        amenity.save()
-        return jsonify(amenity.to_hash()), 200
+        try:
+            Amenity.select().where(Amenity.name == request.form['name']).get()
+            return make_response(jsonify(code=10003, msg="Name already " +
+                                         "exists"), 409)
+        except Amenity.DoesNotExist:
+            params = request.values
+            amenity = Amenity()
+            for key in params:
+                setattr(amenity, key, params.get(key))
+            amenity.save()
+            return jsonify(amenity.to_hash()), 200
 
 
 @app.route('/amenities/<int:amenity_id>', methods=['GET', 'DELETE'])
