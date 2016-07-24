@@ -1,5 +1,7 @@
 from flask import Flask, request, make_response, jsonify
+from app.models.user import User
 from app.models.review import Review
+from app.models.place import Place
 from app.models.review_user import ReviewUser
 from app.models.review_place import ReviewPlace
 from app import app
@@ -16,6 +18,12 @@ def handle_reviews(user_id):
     Keyword arguments:
     user_id = The id of the user that is being reviewed.
     '''
+    try:
+        User.select().where(User.id == user_id).get()
+    except User.DoesNotExist:
+        return make_response(jsonify(msg="There is no user with this id."),
+                             404)
+
     if request.method == 'GET':
         arr = []
         for review_user in ReviewUser.select().where(ReviewUser.user == user_id):
@@ -29,6 +37,9 @@ def handle_reviews(user_id):
         for key in params:
             setattr(review, key, params.get(key))
 
+        if review.message is None or review.user_id is None:
+            return make_response(jsonify(msg="Missing required data."), 404)
+
         review.save()
 
         '''Save the connection in the ReviewUser table.'''
@@ -37,7 +48,7 @@ def handle_reviews(user_id):
         return jsonify(review.to_hash()), 201
 
 
-@app.route('/users/<int:user_id>/my_reviews', methods=['GET', 'POST'])
+@app.route('/users/<int:user_id>/my_reviews', methods=['GET'])
 def handle_my_reviews(user_id):
     '''Returns all the reviews from the database of the user as JSON objects
     with a GET request.
@@ -66,13 +77,13 @@ def handle_review_id(user_id, review_id):
                         (ReviewUser.user == user_id) &
                         (ReviewUser.review == review_id)).get()
     except ReviewUser.DoesNotExist:
-        return make_response(jsonify(msg="Review does not exist."), 409)
+        return make_response(jsonify(msg="Review does not exist."), 404)
 
     if request.method == 'GET':
         return jsonify([this_review.review.to_hash()]), 200
 
     elif request.method == 'DELETE':
-        ReviewUser.delete().where((ReviewUser.place == place_id) &
+        ReviewUser.delete().where((ReviewUser.user == user_id) &
                                   (ReviewUser.review == review_id)).execute()
 
         Review.delete().where(Review.id == review_id).execute()
@@ -89,9 +100,9 @@ def handle_place_reviews(place_id):
     place_id -- The id of the place to be reviewed.
     '''
     try:
-        ReviewPlace.select().where(ReviewPlace.place == place_id).get()
-    except ReviewPlace.DoesNotExist:
-        return make_response(jsonify(msg="Place does not exist."), 409)
+        Place.select().where(Place.id == place_id).get()
+    except Place.DoesNotExist:
+        return make_response(jsonify(msg="Place does not exist."), 404)
 
     if request.method == 'GET':
         arr = []
