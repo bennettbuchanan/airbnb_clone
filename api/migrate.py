@@ -9,6 +9,9 @@ from app.models.place import Place
 from app.models.place_book import PlaceBook
 from app.models.amenity import Amenity
 from app.models.place_amenity import PlaceAmenities
+from app.models.review import Review
+from app.models.review_user import ReviewUser
+from app.models.review_place import ReviewPlace
 from app.models.base import BaseModel
 from peewee import *
 
@@ -18,7 +21,8 @@ tables = [User,
           Place,
           PlaceBook,
           Amenity,
-          PlaceAmenities]
+          PlaceAmenities,
+          Review]
 
 BaseModel.database.connect()
-BaseModel.database.create_tables(tables)
+BaseModel.database.create_tables([Review, ReviewUser, ReviewPlace])
