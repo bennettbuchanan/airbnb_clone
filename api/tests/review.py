@@ -151,7 +151,7 @@ class FlaskTestCase(unittest.TestCase):
         res = self.app.get('/users/1/my_reviews')
         self.assertEqual(len(json.loads(res.data)), 1)
 
-    def test_place_reviews(self):
+    def test_get_place_review(self):
         '''No reviews for this place yet returns empty array. Test a place
         that does not exist, returns 404 status code.'''
         res = self.app.get('/places/1/reviews')
@@ -164,6 +164,54 @@ class FlaskTestCase(unittest.TestCase):
 
         res = self.app.get('/places/1/reviews')
         self.assertEqual(len(json.loads(res.data)), 1)
+
+    def test_post_place_review(self):
+        '''Test that review is empty and then has one place review after 1
+        review is created.'''
+        res = self.app.get('/places/1/reviews')
+        self.assertEqual(len(json.loads(res.data)), 0)
+        self.create_review('/places/1/reviews', 'test', 2)
+        res = self.app.get('/places/1/reviews')
+        self.assertEqual(len(json.loads(res.data)), 1)
+
+        '''Status code is 404 for an unknown review.'''
+        res = self.app.get('/places/2/reviews')
+        self.assertEqual(res.status_code, 404)
+
+    def test_post_place_review(self):
+        '''A non existant review returns 404 status.'''
+        res = self.app.get('/places/1/reviews/1')
+        self.assertEqual(res.status_code, 404)
+
+        '''Create a review and test that it is returned using GET request.'''
+        self.create_review('/places/1/reviews', 'test', 2)
+        res = self.app.get('/places/1/reviews/1')
+        self.assertEqual(len(json.loads(res.data)), 1)
+        self.assertEqual(json.loads(res.data)[0].get('id'), 1)
+
+    def test_delete_place_review(self):
+        '''A non existant review id returns 404 status.'''
+        res = self.app.delete('/places/1/reviews/1')
+        self.assertEqual(res.status_code, 404)
+
+        '''Create a review and test that it is deleted using DELETE request.'''
+        self.create_review('/places/1/reviews', 'test', 2)
+        res = self.app.get('/places/1/reviews/1')
+        self.assertEqual(len(json.loads(res.data)), 1)
+
+        '''While the review is existant, test if place id does not exist.'''
+        res = self.app.delete('/places/2/reviews/1')
+        self.assertEqual(res.status_code, 404)
+
+        '''Test that deletion of a review is successfull. A JSON will be
+        with a message, so do not test for len of get on this route.'''
+        res = self.app.delete('/places/1/reviews/1')
+        self.assertEqual(res.status_code, 200)
+        res = self.app.get('/places/1/reviews/1')
+        self.assertEqual(res.status_code, 404)
+
+        res = self.app.get('/places/1/reviews')
+        self.assertEqual(len(json.loads(res.data)), 0)
 
 if __name__ == '__main__':
     unittest.main()

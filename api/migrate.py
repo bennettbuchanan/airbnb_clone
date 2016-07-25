@@ -15,14 +15,8 @@ from app.models.review_place import ReviewPlace
 from app.models.base import BaseModel
 from peewee import *
 
-tables = [User,
-          State,
-          City,
-          Place,
-          PlaceBook,
-          Amenity,
-          PlaceAmenities,
-          Review]
+tables = [User, State, City, Place, PlaceBook, Amenity, PlaceAmenities,
+          Review, ReviewUser, ReviewPlace]
 
 BaseModel.database.connect()
-BaseModel.database.create_tables([Review, ReviewUser, ReviewPlace])
+BaseModel.database.create_tables(tables)

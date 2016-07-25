@@ -139,7 +139,7 @@ def handle_place_review(place_id, review_id):
                         (ReviewPlace.place == place_id) &
                         (ReviewPlace.review == review_id)).get()
     except ReviewPlace.DoesNotExist:
-        return make_response(jsonify(msg="Review does not exist."), 409)
+        return make_response(jsonify(msg="Review does not exist."), 404)
 
     if request.method == 'GET':
         return jsonify([this_review.review.to_hash()]), 200
