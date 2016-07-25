@@ -25,7 +25,7 @@ def handle_states():
                                          msg="State already exists"), 409)
         except State.DoesNotExist:
             state = State.create(name=request.form['name'])
-            return jsonify(state.to_hash()), 200
+            return jsonify(state.to_hash()), 201
 
 
 @app.route('/states/<int:state_id>', methods=['GET', 'DELETE'])
@@ -42,7 +42,8 @@ def handle_state_id(state_id):
     try:
         state = State.select().where(State.id == state_id).get()
     except State.DoesNotExist:
-        raise Exception("There is no state with this id.")
+        return make_response(jsonify(msg="There is no state with this id."),
+                             404)
 
     if request.method == 'GET':
         return jsonify(state.to_hash()), 200

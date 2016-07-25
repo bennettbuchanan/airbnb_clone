@@ -4,25 +4,29 @@ environment variable AIRBNB_ENV. The default mode is that of user
 '''
 import os
 
-status = os.environ.get('AIRBNB_ENV')
+env = os.environ.get("AIRBNB_ENV")
 
 DEBUG = True
 HOST = "localhost"
 PORT = 3333
-DATABASE = {"host": "158.69.92.186",
-            "user": "airbnb_user_dev",
-            "database": "airbnb_dev",
-            "port": 3306,
-            "charset": "utf8",
-            "password": "airbnb_user_dev"}
+DATABASE = dict(host="158.69.92.186",
+                port=3306,
+                charset="utf8",
+                user="airbnb_user_dev",
+                database="airbnb_dev",
+                password="airbnb_user_dev")
 
-if status == "production":
+if env == "production":
     DEBUG = False
     HOST = "0.0.0.0"
     PORT = 3000
-    DATABASE = {"host": "158.69.92.186",
-                "user": "airbnb_user_prod",
-                "database": "airbnb_prod",
-                "port": 3306,
-                "charset": "utf8",
-                "password": "airbnb_user_prod"}
+    DATABASE.update({"user": "airbnb_user_prod",
+                     "database": "airbnb_prod",
+                     "password": "airbnb_user_prod"})
+
+elif env == "test":
+    DEBUG = False
+    PORT = 5556
+    DATABASE.update({"user": "airbnb_user_test",
+                     "database": "airbnb_test",
+                     "password": os.environ.get("AIRBNB_DATABASE_PWD_TEST")})

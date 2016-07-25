@@ -25,10 +25,17 @@ def handle_users():
         except User.DoesNotExist:
             params = request.values
             user = User()
+
+            '''Check that all the required parameters are made in request.'''
+            required = set(["first_name", "last_name",
+                            "email", "password"]) <= set(params.keys())
+            if required is False:
+                return make_response(jsonify(msg="Missing parameter."), 400)
+
             for key in params:
                 setattr(user, key, params.get(key))
             user.save()
-            return jsonify(user.to_hash()), 200
+            return jsonify(user.to_hash()), 201
 
 
 @app.route('/users/<int:user_id>', methods=['GET', 'PUT', 'DELETE'])
@@ -47,7 +54,7 @@ def handle_user_id(user_id):
     try:
         user = User.select().where(User.id == user_id).get()
     except User.DoesNotExist:
-        raise Exception("There is no user with this id.")
+        return make_response(jsonify(msg="User does not exist."), 404)
 
     if request.method == 'GET':
         return jsonify(user.to_hash()), 200
@@ -56,17 +63,18 @@ def handle_user_id(user_id):
         params = request.values
         for key in params:
             if key == 'email':
-                raise Exception("You may not change the user's email.")
+                return make_response(jsonify(msg="You may not change the " +
+                                             "user's email."), 409)
             else:
                 setattr(user, key, params.get(key))
         user.save()
         return make_response(jsonify(msg="User information updated " +
-                                     "successfully."), 200)
+                                     "successfully."), 201)
 
     elif request.method == 'DELETE':
         try:
             user = User.delete().where(User.id == user_id)
         except User.DoesNotExist:
-            raise Exception("There is no user with this id.")
+            return make_response(jsonify(msg="User does not exist."), 200)
         user.execute()
         return make_response(jsonify(msg="User deleted successfully."), 200)

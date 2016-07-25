@@ -49,7 +49,8 @@ def handle_place_id(place_id):
         params = request.values
         for key in params:
             if key == 'owner' or key == 'city':
-                raise Exception("You may not change the place's %s." % key)
+                return make_response(jsonify(msg="You may not update the " +
+                                             "%s." % key), 409)
             else:
                 setattr(place, key, params.get(key))
         place.save()

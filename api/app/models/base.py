@@ -12,12 +12,9 @@ from config import *
 '''Create the MySQLDatabase database based on appropriate environmnent
 variable.
 '''
-db = MySQLDatabase(DATABASE['database'],
-                   host=DATABASE['host'],
-                   port=DATABASE['port'],
-                   user=DATABASE['user'],
-                   charset=DATABASE['charset'],
-                   passwd=DATABASE['password'])
+db = MySQLDatabase(DATABASE['database'], host=DATABASE['host'],
+                   port=DATABASE['port'], user=DATABASE['user'],
+                   charset=DATABASE['charset'], passwd=DATABASE['password'])
 
 
 class BaseModel(Model):
@@ -43,11 +40,9 @@ class BaseModel(Model):
         '''Stores the BaseModel data in a hash to be used with other model's
         data.
         '''
-        data = {}
-        data['id'] = self.id
-        data['created_at'] = self.created_at.strftime("%Y/%m/%d %H:%M:%S")
-        data['updated_at'] = self.updated_at.strftime("%Y/%m/%d %H:%M:%S")
-        return data
+        return dict(id=self.id,
+                    created_at=self.created_at.strftime("%Y/%m/%d %H:%M:%S"),
+                    updated_at=self.updated_at.strftime("%Y/%m/%d %H:%M:%S"))
 
     class Meta:
         '''Meta configuration is passed on to subclasses. Define the database
