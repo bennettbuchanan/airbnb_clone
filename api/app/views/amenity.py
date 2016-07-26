@@ -54,19 +54,61 @@ def handle_amenity_id(amenity_id):
 
 @app.route('/places/<int:place_id>/amenities', methods=['GET'])
 def handle_place_id_amenity(place_id):
-    '''Returns all amenities of the place_id as JSON objects in an array with a GET
-    request.
+    '''Returns all amenities of the place_id as JSON objects in an array with a
+    GET request.
 
     Keyword arguments:
     place_id: The id of the amenity.
     '''
+    try:
+        PlaceAmenities.select().where(PlaceAmenities.place == place_id).get()
+    except PlaceAmenities.DoesNotExist:
+        return make_response(jsonify(msg="Amenity does not exist."), 404)
+
     if request.method == 'GET':
         arr = []
-        query = (Amenity
-                 .select()
-                 .join(PlaceAmenities)
-                 .join(Place)
-                 .where(Place.id == place_id))
-        for amenity in query:
-            arr.append(amenity.to_hash())
+        for this in (PlaceAmenities
+                     .select()
+                     .where(PlaceAmenities.place == place_id)):
+            arr.append(this.amenity.to_hash())
+
         return jsonify(arr), 200
+
+
+@app.route('/places/<int:place_id>/amenities/<int:amenity_id>',
+           methods=['POST', 'DELETE'])
+def handle_amenity_for_place(place_id, amenity_id):
+    '''Add the amenity with `amenity_id` to the place with `place_id` with a
+    POST request. Delete the amenity with the id of `amenity_id` with a DELETE
+    request.
+
+    Keyword arguments:
+    place_id -- The id of the place.
+    amenity_id -- The id of the amenity.
+    '''
+    try:
+        Amenity.select().where(Amenity.id == amenity_id).get()
+    except Amenity.DoesNotExist:
+        return make_response(jsonify(msg="Amenity does not exist."), 404)
+    try:
+        Place.select().where(Place.id == place_id).get()
+    except Place.DoesNotExist:
+        return make_response(jsonify(msg="Place does not exist."), 404)
+
+    if request.method == 'POST':
+        '''Save the connection in the ReviewPlace table.'''
+        PlaceAmenities().create(place=place_id, amenity=amenity_id)
+
+        return make_response(jsonify(msg="Amenity added to place " +
+                                     "successfully."), 201)
+
+    elif request.method == 'DELETE':
+        (PlaceAmenities
+         .delete()
+         .where((PlaceAmenities.place == place_id) &
+                (PlaceAmenities.amenity == amenity_id))
+         .execute())
+
+        Amenity.delete().where(Amenity.id == amenity_id).execute()
+
+        return make_response(jsonify(msg="Amenity deleted successfully."), 200)

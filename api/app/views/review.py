@@ -149,5 +149,4 @@ def handle_place_review(place_id, review_id):
                                    (ReviewPlace.review == review_id)).execute()
 
         Review.delete().where(Review.id == review_id).execute()
-        return make_response(jsonify(msg="Review deleted successfully."),
-                             200)
+        return make_response(jsonify(msg="Review deleted successfully."), 200)

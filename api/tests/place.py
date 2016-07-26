@@ -50,7 +50,7 @@ class FlaskTestCase(unittest.TestCase):
         return self.app.post(route, data=dict(
             owner=1,
             city=1,
-            name="test",
+            name=name_param,
             description="test",
             latitude=0,
             longitude=0
