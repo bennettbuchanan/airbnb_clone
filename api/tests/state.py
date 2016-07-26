@@ -17,11 +17,11 @@ class FlaskTestCase(unittest.TestCase):
         self.app = app.test_client()
         logging.disable(logging.CRITICAL)
         BaseModel.database.connect()
-        BaseModel.database.create_table(State)
+        BaseModel.database.create_tables([State])
 
     def tearDown(self):
         '''Drops the table State.'''
-        BaseModel.database.drop_table(State)
+        BaseModel.database.drop_tables([State])
 
     def create_state(self, state_name):
         '''Makes a post request with the parameters in dict. This adds a state

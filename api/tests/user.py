@@ -17,11 +17,11 @@ class FlaskTestCase(unittest.TestCase):
         self.app = app.test_client()
         logging.disable(logging.CRITICAL)
         BaseModel.database.connect()
-        BaseModel.database.create_table(User)
+        BaseModel.database.create_tables([User])
 
     def tearDown(self):
         '''Drops the table User.'''
-        BaseModel.database.drop_table(User)
+        BaseModel.database.drop_tables([User])
 
     def create_user(self, first, last, address, pw):
         '''Makes a post request with the parameters in dict. Essentially this
