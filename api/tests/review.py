@@ -90,15 +90,15 @@ class FlaskTestCase(unittest.TestCase):
             self.assertEqual(json.loads(res.data).get('id'), i)
 
         '''Test for a cases where required parameters are missing or improper
-        types are passed as parameter (e.g., an string instead of an int).'''
-        missing_message = self.app.post('/users/1/reviews', data=dict(
+        types are passed as parameter (e.g., a string instead of an int).'''
+        missing_message_param = self.app.post('/users/1/reviews', data=dict(
             user=2
         ))
         missing_user = self.app.post('/users/1/reviews', data=dict(
             message="test"
         ))
-        self.assertEqual(missing_message.status_code, 404)
-        self.assertEqual(missing_user.status_code, 404)
+        self.assertEqual(missing_message_param.status_code, 400)
+        self.assertEqual(missing_user.status_code, 400)
 
         '''TODO: Add test for incorrect data types.'''
 

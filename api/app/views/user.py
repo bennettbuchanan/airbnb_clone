@@ -20,19 +20,20 @@ def handle_users():
     elif request.method == 'POST':
         try:
             User.select().where(User.email == request.form['email']).get()
-            return make_response(jsonify(code=10000,
-                                         msg="Email already exists"), 409)
+            return jsonify(code=10000, msg="Email already exists"), 409
         except User.DoesNotExist:
             params = request.values
             user = User()
 
             '''Check that all the required parameters are made in request.'''
-            required = set(["first_name", "last_name",
-                            "email", "password"]) <= set(params.keys())
+            required = set(["first_name", "last_name", "email",
+                            "password"]) <= set(params.keys())
             if required is False:
-                return make_response(jsonify(msg="Missing parameter."), 400)
+                return jsonify(msg="Missing parameter."), 400
 
             for key in params:
+                if key == 'updated_at' or key == 'created_at':
+                    continue
                 setattr(user, key, params.get(key))
             user.save()
             return jsonify(user.to_hash()), 201
@@ -63,13 +64,13 @@ def handle_user_id(user_id):
         params = request.values
         for key in params:
             if key == 'email':
-                return make_response(jsonify(msg="You may not change the " +
-                                             "user's email."), 409)
+                return jsonify(msg="You may not change the user's email."), 409
+            if key == 'updated_at' or key == 'created_at':
+                continue
             else:
                 setattr(user, key, params.get(key))
         user.save()
-        return make_response(jsonify(msg="User information updated " +
-                                     "successfully."), 201)
+        return jsonify(msg="User information updated successfully."), 201
 
     elif request.method == 'DELETE':
         try:
@@ -77,4 +78,4 @@ def handle_user_id(user_id):
         except User.DoesNotExist:
             return make_response(jsonify(msg="User does not exist."), 200)
         user.execute()
-        return make_response(jsonify(msg="User deleted successfully."), 200)
+        return jsonify(msg="User deleted successfully."), 200

@@ -1,4 +1,4 @@
-from flask import Flask, request, make_response, jsonify
+from flask import Flask, request, jsonify
 from app.models.state import State
 from app.models.city import City
 from app import app
@@ -20,15 +20,17 @@ def handle_city(state_id):
         return jsonify(arr), 200
 
     elif request.method == 'POST':
-        params = request.values
         try:
             City.select().where((City.name == request.form['name']) &
                                 (City.state == state_id)
                                 ).get()
-            return make_response(jsonify(code=10002,
-                                         msg="City already exists in this " +
-                                         "state"), 409)
+            return jsonify(code=10002, msg="City already exists in this " +
+                           "state"), 409
         except City.DoesNotExist:
+            '''Check that all the required parameters are made in request.'''
+            required = set(["name"]) <= set(request.values.keys())
+            if required is False:
+                return jsonify(msg="Missing parameter."), 400
             city = City.create(name=request.form['name'], state=state_id)
             return jsonify(city.to_hash()), 200
 
@@ -49,7 +51,7 @@ def handle_city_id(state_id, city_id):
                                    (City.state == state_id)
                                    ).get()
     except City.DoesNotExist:
-        raise Exception("There is no city with this id, in this state.")
+        raise jsonify(msg="There is no city with this id in this state."), 400
 
     if request.method == 'GET':
         return jsonify(city.to_hash())
@@ -61,4 +63,4 @@ def handle_city_id(state_id, city_id):
         except City.DoesNotExist:
             raise Exception("There is no city with this id, in this state.")
         city.execute()
-        return make_response(jsonify(msg="City deleted successfully."), 200)
+        return jsonify(msg="City deleted successfully."), 200

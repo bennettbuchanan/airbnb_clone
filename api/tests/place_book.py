@@ -32,7 +32,9 @@ class FlaskTestCase(unittest.TestCase):
             password="test"
         ))
 
-        self.app.post('/states', data=dict(name="test"))
+        self.app.post('/states', data=dict(
+            name="test"
+        ))
 
         self.app.post('/states/1/cities', data=dict(
             name="test",
@@ -47,6 +49,14 @@ class FlaskTestCase(unittest.TestCase):
             latitude=0,
             longitude=0
         ))
+
+        '''Create two placebooks.'''
+        for i in range(1, 3):
+            res = self.create_placebook('/places/1/books',
+                                        (datetime
+                                         .now()
+                                         .strftime("%Y/%m/%d %H:%M:%S")),
+                                        'test_' + str(i))
 
     def tearDown(self):
         '''Drops the state and city tables.'''
@@ -72,40 +82,36 @@ class FlaskTestCase(unittest.TestCase):
         ))
 
     def test_create(self):
-        for i in range(1, 3):
+        for i in range(3, 5):
             res = self.create_placebook('/places/1/books',
-                                        datetime.now().strftime("%Y/%m/%d %H:%M:%S"),
+                                        (datetime
+                                         .now()
+                                         .strftime("%Y/%m/%d %H:%M:%S")),
                                         'test_' + str(i))
 
             '''The dictionary returns an object with the correct id.'''
             self.assertEqual(json.loads(res.data).get('id'), i)
 
         res = self.app.get('/places/1/books')
-        self.assertEqual(len(json.loads(res.data)), 2)
+        self.assertEqual(len(json.loads(res.data)), 4)
 
         '''date_start field must take the form "%Y/%m/%d %H:%M:%S", test
         for this case by giving it an incorrect format (year comes after day
-        and month).'''
-        res = self.create_placebook('/places/1/books',
-                                    '07/21/2016 13:00:16',
+        and month).
+        '''
+        res = self.create_placebook('/places/1/books', '07/21/2016 13:00:16',
                                     'test')
 
         self.assertEqual(res.status_code, 409)
 
     def test_create_id(self):
-        for i in range(1, 3):
-            res = self.create_placebook('/places/1/books',
-                                        datetime.now().strftime("%Y/%m/%d %H:%M:%S"),
-                                        'test_' + str(i))
-
+        '''Update the boolean `is_validated` of the book. It is False by
+        default.
+        '''
         res = self.app.get('/places/1/books/2')
         self.assertEqual(json.loads(res.data).get("id"), 2)
 
-        '''Update the boolean `is_validated` of the book. It is False by
-        default.'''
-        res = self.app.put('/places/1/books/2', data=dict(
-            is_validated=True,
-        ))
+        res = self.app.put('/places/1/books/2', data=dict(is_validated=True,))
 
         res = self.app.get('/places/1/books/2')
         self.assertEqual(json.loads(res.data).get("is_validated"), True)
@@ -117,11 +123,8 @@ class FlaskTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 409)
 
     def test_delete(self):
-        for i in range(1, 3):
-            res = self.create_placebook('/places/1/books',
-                                        datetime.now().strftime("%Y/%m/%d %H:%M:%S"),
-                                        'test_' + str(i))
-        '''Delete book with the id 1.'''
+        '''Delete book with the id passed as URL path.'''
+
         self.app.delete('/places/1/books/1')
 
         '''There is only one remaining booking in the table, that with id 2.'''

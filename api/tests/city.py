@@ -23,6 +23,10 @@ class FlaskTestCase(unittest.TestCase):
         '''Create a state for routing purposes.'''
         self.app.post('/states', data=dict(name="test"))
 
+        '''Create two new cities.'''
+        for i in range(1, 3):
+            res = self.create_city("test_" + str(i))
+
     def tearDown(self):
         '''Drops the state and city tables.'''
         BaseModel.database.drop_tables([State, City])
@@ -40,9 +44,9 @@ class FlaskTestCase(unittest.TestCase):
         ))
 
     def test_create(self):
-        for i in range(1, 3):
+        '''The dictionary returns an object with the correct id.'''
+        for i in range(3, 5):
             res = self.create_city("test_" + str(i))
-            '''The dictionary returns an object with the correct id.'''
             self.assertEqual(json.loads(res.data).get("id"), i)
 
         lacking_param = self.app.post('/states/1/cities',
@@ -56,26 +60,20 @@ class FlaskTestCase(unittest.TestCase):
         self.assertEqual(json.loads(non_unique_name.data).get("code"), 10002)
 
     def test_list(self):
-        res = self.app.get('/states/1/cities')
-        self.assertEqual(len(json.loads(res.data)), 0)
-
         '''Add one city to database.'''
+        res = self.app.get('/states/1/cities')
+        self.assertEqual(len(json.loads(res.data)), 2)
+
         res = self.create_city("test")
         res = self.app.get('/states/1/cities')
-        self.assertEqual(len(json.loads(res.data)), 1)
+        self.assertEqual(len(json.loads(res.data)), 3)
 
     def test_create_with_id(self):
-        for i in range(1, 3):
-            res = self.create_city("test_" + str(i))
-
         '''The application returns an object with the correct id.'''
         res = self.app.get('/states/1/cities/2')
         self.assertEqual(json.loads(res.data).get("id"), 2)
 
     def test_delete(self):
-        for i in range(1, 3):
-            res = self.create_city("test_" + str(i))
-
         '''The application deletes an object with the correct id.'''
         res = self.app.delete('/states/1/cities/1')
         self.assertEqual(res.status_code, 200)

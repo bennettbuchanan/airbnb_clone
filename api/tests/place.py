@@ -35,6 +35,10 @@ class FlaskTestCase(unittest.TestCase):
             password="test"
         ))
 
+        '''Create two places.'''
+        for i in range(1, 3):
+            self.create_place('/places', 'test_' + str(i))
+
     def tearDown(self):
         '''Drops the state and city tables.'''
         BaseModel.database.drop_tables([User, City, Place, State])
@@ -57,19 +61,14 @@ class FlaskTestCase(unittest.TestCase):
         ))
 
     def test_create(self):
-        for i in range(1, 3):
+        '''The dictionary returns an object with the correct id.'''
+        for i in range(3, 5):
             res = self.create_place('/places', 'test_' + str(i))
-
-            '''The dictionary returns an object with the correct id.'''
             self.assertEqual(json.loads(res.data).get('id'), i)
 
     def test_create_id(self):
-        for i in range(1, 3):
-            res = self.create_place('/places', 'test_' + str(i))
-
-        res = self.app.get('/places/2')
-
         '''The dictionary returns an object with the correct id.'''
+        res = self.app.get('/places/2')
         self.assertEqual(json.loads(res.data).get('id'), 2)
 
         '''Update the id of the item.'''
@@ -86,9 +85,6 @@ class FlaskTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 409)
 
     def test_delete(self):
-        for i in range(1, 3):
-            self.create_place('/places', 'test_' + str(i))
-
         '''Delete place with the id 2.'''
         self.app.delete('/places/2')
 
@@ -98,12 +94,10 @@ class FlaskTestCase(unittest.TestCase):
         self.assertEqual(json.loads(res.data)[0].get('id'), 1)
 
     def test_get_places_by_id(self):
-        for i in range(1, 3):
-            self.create_place('/places', 'test_' + str(i))
+        '''Test creation of place in this city and state.'''
         res = self.app.get('/states/1/cities/1/places')
         self.assertEqual(len(json.loads(res.data)), 2)
 
-        '''Test creation of place in this city and state.'''
         res = self.app.post('/states/1/cities/1/places', data=dict(
             owner=1,
             city=1,
@@ -112,6 +106,7 @@ class FlaskTestCase(unittest.TestCase):
             latitude=0,
             longitude=0
         ))
+
         res = self.app.get('/states/1/cities/1/places')
         self.assertEqual(len(json.loads(res.data)), 3)
 

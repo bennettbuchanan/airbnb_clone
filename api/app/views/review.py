@@ -1,4 +1,4 @@
-from flask import Flask, request, make_response, jsonify
+from flask import Flask, request, jsonify
 from app.models.user import User
 from app.models.review import Review
 from app.models.place import Place
@@ -13,7 +13,9 @@ def handle_reviews(user_id):
     accomplished through querying the ReviewUser table, and returning rows in
     which `user_id` is equal to the id of a user. Then, using the
     ForeignKeyField, retrieve those particular reviews with the to_hash()
-    method.
+    method. Will not add attributes `updated_at` or `created_at`. Note: this
+    route is for reviewing the user with id `user_id`. The user id passed as
+    a parameter with a POST request is the user making the review.
 
     Keyword arguments:
     user_id = The id of the user that is being reviewed.
@@ -21,12 +23,13 @@ def handle_reviews(user_id):
     try:
         User.select().where(User.id == user_id).get()
     except User.DoesNotExist:
-        return make_response(jsonify(msg="There is no user with this id."),
-                             404)
+        return jsonify(msg="There is no user with this id."), 404
 
     if request.method == 'GET':
         arr = []
-        for review_user in ReviewUser.select().where(ReviewUser.user == user_id):
+        for review_user in (ReviewUser
+                            .select()
+                            .where(ReviewUser.user == user_id)):
             arr.append(review_user.review.to_hash())
         return jsonify(arr), 200
 
@@ -34,11 +37,18 @@ def handle_reviews(user_id):
         params = request.values
         review = Review()
 
+        '''Check that all the required parameters are made in request.'''
+        required = set(["message", "user"]) <= set(request.values.keys())
+        if required is False:
+            return jsonify(msg="Missing parameter."), 400
+
         for key in params:
+            if key == 'updated_at' or key == 'created_at':
+                continue
             setattr(review, key, params.get(key))
 
         if review.message is None or review.user_id is None:
-            return make_response(jsonify(msg="Missing required data."), 404)
+            return jsonify(msg="Missing required data."), 404
 
         review.save()
 
@@ -77,7 +87,7 @@ def handle_review_id(user_id, review_id):
                         (ReviewUser.user == user_id) &
                         (ReviewUser.review == review_id)).get()
     except ReviewUser.DoesNotExist:
-        return make_response(jsonify(msg="Review does not exist."), 404)
+        return jsonify(msg="Review does not exist."), 404
 
     if request.method == 'GET':
         return jsonify([this_review.review.to_hash()]), 200
@@ -87,14 +97,15 @@ def handle_review_id(user_id, review_id):
                                   (ReviewUser.review == review_id)).execute()
 
         Review.delete().where(Review.id == review_id).execute()
-        return make_response(jsonify(msg="Review deleted successfully."), 200)
+        return jsonify(msg="Review deleted successfully."), 200
 
 
 @app.route('/places/<int:place_id>/reviews', methods=['GET', 'POST'])
 def handle_place_reviews(place_id):
     '''Returns an array of reviews of the place with the same id as that of
     the parameter `place_id` with a GET request. Creates a new review with
-    the place_id.
+    the place_id with a POST request. Will not add attributes `updated_at` or
+    `created_at`.
 
     Keyword arguments:
     place_id -- The id of the place to be reviewed.
@@ -102,11 +113,13 @@ def handle_place_reviews(place_id):
     try:
         Place.select().where(Place.id == place_id).get()
     except Place.DoesNotExist:
-        return make_response(jsonify(msg="Place does not exist."), 404)
+        return jsonify(msg="Place does not exist."), 404
 
     if request.method == 'GET':
         arr = []
-        for review_place in ReviewPlace.select().where(ReviewPlace.place == place_id):
+        for review_place in (ReviewPlace
+                             .select()
+                             .where(ReviewPlace.place == place_id)):
             arr.append(review_place.review.to_hash())
         return jsonify(arr), 200
 
@@ -114,7 +127,14 @@ def handle_place_reviews(place_id):
         params = request.values
         review = Review()
 
+        '''Check that all the required parameters are made in request.'''
+        required = set(["message", "user"]) <= set(request.values.keys())
+        if required is False:
+            return jsonify(msg="Missing parameter."), 400
+
         for key in params:
+            if key == 'updated_at' or key == 'created_at':
+                continue
             setattr(review, key, params.get(key))
 
         review.save()
@@ -139,7 +159,7 @@ def handle_place_review(place_id, review_id):
                         (ReviewPlace.place == place_id) &
                         (ReviewPlace.review == review_id)).get()
     except ReviewPlace.DoesNotExist:
-        return make_response(jsonify(msg="Review does not exist."), 404)
+        return jsonify(msg="Review does not exist."), 404
 
     if request.method == 'GET':
         return jsonify([this_review.review.to_hash()]), 200
@@ -149,4 +169,4 @@ def handle_place_review(place_id, review_id):
                                    (ReviewPlace.review == review_id)).execute()
 
         Review.delete().where(Review.id == review_id).execute()
-        return make_response(jsonify(msg="Review deleted successfully."), 200)
+        return jsonify(msg="Review deleted successfully."), 200

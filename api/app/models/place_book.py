@@ -30,8 +30,10 @@ class PlaceBook(BaseModel):
         formatting consistent for both returned strings.
         '''
         if type(self.date_start) == unicode:
-            data['date_start'] = datetime.strptime(self.date_start,
-                                                   "%Y/%m/%d %H:%M:%S").strftime("%Y/%m/%d %H:%M:%S")
+            data['date_start'] = (datetime
+                                  .strptime(self.date_start,
+                                            "%Y/%m/%d %H:%M:%S")
+                                  .strftime("%Y/%m/%d %H:%M:%S"))
         else:
             data['date_start'] = self.date_start.strftime("%Y/%m/%d %H:%M:%S")
         data['number_nights'] = self.number_nights

@@ -27,13 +27,19 @@ class Review(BaseModel):
                     user=self.user.id, fromuserid=self.user.id)
 
         try:
-            review = ReviewUser.select().where(ReviewUser.review == self.id).get()
+            review = (ReviewUser
+                      .select()
+                      .where(ReviewUser.review == self.id)
+                      .get())
             data['touserid'] = review.user.id
         except ReviewUser.DoesNotExist:
             data['touserid'] = None
 
         try:
-            review = ReviewPlace.select().where(ReviewPlace.review == self.id).get()
+            review = (ReviewPlace
+                      .select()
+                      .where(ReviewPlace.review == self.id)
+                      .get())
             data['toplaceid'] = review.place.id
         except ReviewPlace.DoesNotExist:
             data['toplaceid'] = None

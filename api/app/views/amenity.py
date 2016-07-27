@@ -1,4 +1,4 @@
-from flask import Flask, request, make_response, jsonify
+from flask import Flask, request, jsonify
 from app.models.amenity import Amenity
 from app.models.place import Place
 from app.models.place_amenity import PlaceAmenities
@@ -19,14 +19,14 @@ def handle_amenity():
     elif request.method == 'POST':
         try:
             Amenity.select().where(Amenity.name == request.form['name']).get()
-            return make_response(jsonify(code=10003, msg="Name already " +
-                                         "exists"), 409)
+            return jsonify(code=10003, msg="Name already exists"), 409
         except Amenity.DoesNotExist:
-            params = request.values
-            amenity = Amenity()
-            for key in params:
-                setattr(amenity, key, params.get(key))
-            amenity.save()
+            '''Check that all the required parameters are made in request.'''
+            required = set(["name"]) <= set(request.values.keys())
+            if required is False:
+                return jsonify(msg="Missing parameter."), 400
+
+            amenity = Amenity.create(name=request.form['name'])
             return jsonify(amenity.to_hash()), 200
 
 
@@ -49,7 +49,7 @@ def handle_amenity_id(amenity_id):
     elif request.method == 'DELETE':
         amenity = Amenity.delete().where(Amenity.id == amenity_id)
         amenity.execute()
-        return make_response(jsonify(msg="Amenity deleted successfully."), 200)
+        return jsonify(msg="Amenity deleted successfully."), 200
 
 
 @app.route('/places/<int:place_id>/amenities', methods=['GET'])
@@ -63,7 +63,7 @@ def handle_place_id_amenity(place_id):
     try:
         PlaceAmenities.select().where(PlaceAmenities.place == place_id).get()
     except PlaceAmenities.DoesNotExist:
-        return make_response(jsonify(msg="Amenity does not exist."), 404)
+        return jsonify(msg="Amenity does not exist."), 404
 
     if request.method == 'GET':
         arr = []
@@ -89,18 +89,17 @@ def handle_amenity_for_place(place_id, amenity_id):
     try:
         Amenity.select().where(Amenity.id == amenity_id).get()
     except Amenity.DoesNotExist:
-        return make_response(jsonify(msg="Amenity does not exist."), 404)
+        return jsonify(msg="Amenity does not exist."), 404
     try:
         Place.select().where(Place.id == place_id).get()
     except Place.DoesNotExist:
-        return make_response(jsonify(msg="Place does not exist."), 404)
+        return jsonify(msg="Place does not exist."), 404
 
     if request.method == 'POST':
         '''Save the connection in the ReviewPlace table.'''
         PlaceAmenities().create(place=place_id, amenity=amenity_id)
 
-        return make_response(jsonify(msg="Amenity added to place " +
-                                     "successfully."), 201)
+        return jsonify(msg="Amenity added to place successfully."), 201
 
     elif request.method == 'DELETE':
         (PlaceAmenities
@@ -111,4 +110,4 @@ def handle_amenity_for_place(place_id, amenity_id):
 
         Amenity.delete().where(Amenity.id == amenity_id).execute()
 
-        return make_response(jsonify(msg="Amenity deleted successfully."), 200)
+        return jsonify(msg="Amenity deleted successfully."), 200

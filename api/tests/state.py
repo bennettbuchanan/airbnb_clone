@@ -35,9 +35,9 @@ class FlaskTestCase(unittest.TestCase):
         ))
 
     def test_create(self):
+        '''The dictionary returns an object with the correct id.'''
         for i in range(1, 3):
             res = self.create_state("test_" + str(i))
-            '''The dictionary returns an object with the correct id.'''
             self.assertEqual(json.loads(res.data).get("id"), i)
 
         lacking_param = self.app.post('/states', data=dict(bad_param="test"))

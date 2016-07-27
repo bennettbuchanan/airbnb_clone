@@ -6,6 +6,8 @@ from app.views import user
 from app.models.user import User
 from app.models.base import BaseModel
 from peewee import *
+import time
+from datetime import datetime
 
 
 class FlaskTestCase(unittest.TestCase):
@@ -39,34 +41,34 @@ class FlaskTestCase(unittest.TestCase):
         ))
 
     def test_create(self):
+        '''The dictionary returns an object with the correct id.'''
         for i in range(1, 3):
             res = self.create_user("test", str(i), str(i), str(i))
-            '''The dictionary returns an object with the correct id.'''
             self.assertEqual(json.loads(res.data).get("id"), i)
 
         lacking_param = self.app.post('/users', data=dict(first_name="test"))
         non_unique_email = self.create_user("test", str(i), str(i), str(i))
-
         self.assertEqual(lacking_param.status_code, 400)
         self.assertEqual(non_unique_email.status_code, 409)
 
     def test_list(self):
+        '''Add one user to databse.'''
         res = self.app.get('/users')
         self.assertEqual(len(json.loads(res.data)), 0)
 
-        '''Add one user to databse.'''
         self.create_user("test", "test", "test", "test")
         res = self.app.get('/users')
         self.assertEqual(len(json.loads(res.data)), 1)
 
     def test_get(self):
+        '''The service returns gets the proper user when id is passed in the
+        URL path, and returns a 200 status_code for a non existant user.'''
         res = self.create_user("user_1", "user_1", "user_1", "user_1")
         self.assertEqual(res.status_code, 201)
 
         res = self.app.get('/users/1')
         self.assertEqual(json.loads(res.data).get("first_name"), "user_1")
 
-        '''The service returns 200 for a non existant user.'''
         res = self.app.get('/users/2')
         self.assertEqual(res.status_code, 404)
 
@@ -95,13 +97,31 @@ class FlaskTestCase(unittest.TestCase):
         res = self.create_user("user_1", "user_1", "user_1", "user_1")
         self.assertEqual(res.status_code, 201)
 
+        '''Delay 2 seconds so `updated_at` value will be different than
+        `created_at`.'''
+        time.sleep(2)
+
         '''Update user_1, check the status code.'''
         res = self.app.put('/users/1', data=dict(
             first_name="updated",
             last_name="updated",
+            created_at="1989/07/10 22:00:00",
+            updated_at="1989/07/10 22:00:00"
         ))
+
         self.assertEqual(res.status_code, 201)
         res = self.app.get('/users')
+
+        '''PUT request may not update created_at or updated_at fields.'''
+        self.assertNotEqual(json.loads(res.data)[0].get('updated_at'),
+                            "1989/07/10 22:00:00")
+        self.assertNotEqual(json.loads(res.data)[0].get('created_at'),
+                            "1989/07/10 22:00:00")
+
+        '''`updated_at` value should be ahead of `created_at` by at least
+        2 seconds.'''
+        self.assertNotEqual(json.loads(res.data)[0].get('created_at'),
+                            json.loads(res.data)[0].get('updated_at'))
 
         '''Check the values of the updated user are correct.'''
         keys = ["first_name", "last_name"]
