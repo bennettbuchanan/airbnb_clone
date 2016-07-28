@@ -1,6 +1,9 @@
 from flask import Flask, request, jsonify
 from app.models.place import Place
+from app.models.place_book import PlaceBook
+from app.models.state import State
 from app import app
+from datetime import datetime, timedelta
 
 
 @app.route('/places', methods=['GET', 'POST'])
@@ -75,6 +78,58 @@ def handle_place_id(place_id):
         return jsonify(msg="Place deleted successfully."), 200
 
 
+@app.route('/places/<int:place_id>/available', methods=['POST'])
+def handle_place_availibility(place_id):
+    if request.method == 'POST':
+        try:
+            Place.select().where(Place.id == place_id).get()
+        except Place.DoesNotExist:
+            return jsonify("No place exists with this id."), 400
+
+        date_requested = ''
+        for param in ['year', 'month', 'day']:
+            date_requested+=request.form[param] + '/'
+
+        book_inquiry = datetime.strptime(date_requested[:-1], "%Y/%m/%d")
+
+        arr = []
+        for place_book in (PlaceBook
+                           .select()
+                           .where(PlaceBook.place == place_id)
+                           .iterator()):
+            start = place_book.date_start
+            end = start + timedelta(days=place_book.number_nights)
+
+            if book_inquiry >= start and book_inquiry < end:
+                return jsonify(available=False), 200
+
+        return jsonify(available=True), 200
+
+
+@app.route('/states/<int:state_id>/places', methods=['GET'])
+def handle_place_state_id(state_id):
+    '''Retrieve all the places with a state of that passed in the URL.
+
+    Keyword arguments:
+    state_id -- The id of the state that this place belongs.
+    '''
+    if request.method == 'GET':
+        try:
+            State.select().where(State.id == state_id).get()
+        except State.DoesNotExist:
+            return jsonify("No state exists with this id."), 400
+
+        arr = []
+        for place in Place.select().iterator():
+            if place.city.state.id == state_id:
+                arr.append(place.to_hash())
+
+        if len(arr) == 0:
+            return jsonify(msg="There is no place in this state."), 400
+
+        return jsonify(arr), 200
+
+
 @app.route('/states/<int:state_id>/cities/<int:city_id>/places',
            methods=['GET', 'POST'])
 def handle_place_city_id(state_id, city_id):
@@ -91,7 +146,8 @@ def handle_place_city_id(state_id, city_id):
         try:
             places = Place.select().where(Place.city == city_id).get()
         except Place.DoesNotExist:
-            raise Exception("There is no place with this id, in this state.")
+            return jsonify("There is no place with this id, in this state."),
+            400
 
         arr = []
         for place in Place.select().where(Place.city == city_id):
