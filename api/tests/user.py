@@ -54,11 +54,31 @@ class FlaskTestCase(unittest.TestCase):
     def test_list(self):
         '''Add one user to databse.'''
         res = self.app.get('/users')
-        self.assertEqual(len(json.loads(res.data)), 0)
+        self.assertEqual(len(json.loads(res.data)[0].get('data')), 0)
 
-        self.create_user("test", "test", "test", "test")
+        for i in range(1, 16):
+            self.create_user("test_" + str(i), "test_" + str(i),
+                             "test_" + str(i), "test_" + str(i))
+
+        '''Default returns 10 items.'''
         res = self.app.get('/users')
-        self.assertEqual(len(json.loads(res.data)), 1)
+        self.assertEqual(len(json.loads(res.data)[0].get('data')), 10)
+
+        res = self.app.get('/users?page=2&number=10')
+        self.assertEqual(len(json.loads(res.data)[0].get('data')), 5)
+        self.assertEqual(
+            json.loads(res.data)[1].get('paging').get('next'), None)
+
+        res = self.app.get('/users?page=1&number=10')
+        self.assertEqual(len(json.loads(res.data)[0].get('data')), 10)
+        self.assertEqual(
+            json.loads(res.data)[1].get('paging').get('previous'), None)
+
+        res = self.app.get('/users?page=2&number=2')
+        self.assertNotEqual(
+            json.loads(res.data)[1].get('paging').get('next'), None)
+        self.assertNotEqual(
+            json.loads(res.data)[1].get('paging').get('previous'), None)
 
     def test_get(self):
         '''The service returns gets the proper user when id is passed in the
@@ -79,12 +99,12 @@ class FlaskTestCase(unittest.TestCase):
 
         '''Check that there is one user in the table.'''
         res = self.app.get('/users')
-        self.assertEqual(len(json.loads(res.data)), 1)
+        self.assertEqual(len(json.loads(res.data)[0].get('data')), 1)
 
         '''Delete the user and check that the table is empty.'''
         self.app.delete('/users/1')
         res = self.app.get('/users')
-        self.assertEqual(len(json.loads(res.data)), 0)
+        self.assertEqual(len(json.loads(res.data)[0].get('data')), 0)
 
         '''The service returns 404 when attempting to delete a non-existant
         user.
@@ -113,20 +133,31 @@ class FlaskTestCase(unittest.TestCase):
         res = self.app.get('/users')
 
         '''PUT request may not update created_at or updated_at fields.'''
-        self.assertNotEqual(json.loads(res.data)[0].get('updated_at'),
+        self.assertNotEqual(json.loads(res.data)[0]
+                            .get('data')[0]
+                            .get('updated_at'),
                             "1989/07/10 22:00:00")
-        self.assertNotEqual(json.loads(res.data)[0].get('created_at'),
+        self.assertNotEqual(json.loads(res.data)[0]
+                            .get('data')[0]
+                            .get('created_at'),
                             "1989/07/10 22:00:00")
 
         '''`updated_at` value should be ahead of `created_at` by at least
         2 seconds.'''
-        self.assertNotEqual(json.loads(res.data)[0].get('created_at'),
-                            json.loads(res.data)[0].get('updated_at'))
+        self.assertNotEqual(json.loads(res.data)[0]
+                            .get('data')[0]
+                            .get('created_at'),
+                            json.loads(res.data)[0]
+                            .get('data')[0]
+                            .get('updated_at'))
 
         '''Check the values of the updated user are correct.'''
         keys = ["first_name", "last_name"]
         for key in keys:
-            self.assertEqual(json.loads(res.data)[0].get(key), "updated")
+            self.assertEqual(json.loads(res.data)[0]
+                             .get('data')[0]
+                             .get(key),
+                             "updated")
 
         '''The service returns 404 when attempting to update a non-existant
         user.'''

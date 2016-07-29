@@ -80,11 +80,23 @@ def handle_place_id(place_id):
 
 @app.route('/places/<int:place_id>/available', methods=['POST'])
 def handle_place_availibility(place_id):
+    '''Checks to see if a place is available on a particular date that is
+    passed as parameter with a POST request. Data required is 'year', 'month',
+    and 'day'.
+
+    Keyword arguments:
+    place_id -- The id of the place to determine if the date is already booked.
+    '''
     if request.method == 'POST':
         try:
             Place.select().where(Place.id == place_id).get()
         except Place.DoesNotExist:
             return jsonify("No place exists with this id."), 400
+
+        '''Check that all the required parameters are made in request.'''
+        required = set(["year", "month", "day"]) <= set(request.values.keys())
+        if required is False:
+            return jsonify(msg="Missing parameter."), 400
 
         date_requested = ''
         for param in ['year', 'month', 'day']:

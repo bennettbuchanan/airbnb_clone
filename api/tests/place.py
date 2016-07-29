@@ -142,15 +142,18 @@ class FlaskTestCase(unittest.TestCase):
 
         res = self.app.get('/places/1/books/1')
 
-        res = self.app.post('/places/1/available', data=dict(year=2000, month=1,
+        res = self.app.post('/places/1/available', data=dict(year=2000,
+                                                             month=1,
                                                              day=11))
 
         self.assertEqual(json.loads(res.data).get('available'), True)
 
-        res = self.app.post('/places/1/available', data=dict(year=2000, month=1,
+        res = self.app.post('/places/1/available', data=dict(year=2000,
+                                                             month=1,
                                                              day=1))
 
-        res = self.app.post('/places/1/available', data=dict(year=2000, month=1,
+        res = self.app.post('/places/1/available', data=dict(year=2000,
+                                                             month=1,
                                                              day=10))
 
         self.assertEqual(json.loads(res.data).get('available'), False)
@@ -168,10 +171,17 @@ class FlaskTestCase(unittest.TestCase):
             longitude=0
         ))
 
-        res = self.app.post('/places/1/available', data=dict(year=2000, month=1,
+        res = self.app.post('/places/1/available', data=dict(year=2000,
+                                                             month=1,
                                                              day=11))
 
         self.assertEqual(json.loads(res.data).get('available'), False)
+
+        '''Test for missing parameter in POST request.'''
+        missing_param = self.app.post('/places/1/available',
+                                      data=dict(year=2000))
+
+        self.assertEqual(missing_param.status_code, 400)
 
 if __name__ == '__main__':
     unittest.main()

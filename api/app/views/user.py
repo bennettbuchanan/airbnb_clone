@@ -1,5 +1,6 @@
-from flask import Flask, request, make_response, jsonify
+from flask import request, jsonify
 from app.models.user import User
+from return_styles import ListStyle
 from app import app
 
 
@@ -12,10 +13,8 @@ def handle_users():
     http://docs.peewee-orm.com/en/latest/peewee/api.html#SelectQuery.get
     '''
     if request.method == 'GET':
-        arr = []
-        for user in User.select():
-            arr.append(user.to_hash())
-        return jsonify(arr), 200
+        list = ListStyle().list(User.select(), request)
+        return jsonify(list), 200
 
     elif request.method == 'POST':
         try:
@@ -55,7 +54,7 @@ def handle_user_id(user_id):
     try:
         user = User.select().where(User.id == user_id).get()
     except User.DoesNotExist:
-        return make_response(jsonify(msg="User does not exist."), 404)
+        return jsonify(msg="User does not exist."), 404
 
     if request.method == 'GET':
         return jsonify(user.to_hash()), 200
@@ -76,6 +75,6 @@ def handle_user_id(user_id):
         try:
             user = User.delete().where(User.id == user_id)
         except User.DoesNotExist:
-            return make_response(jsonify(msg="User does not exist."), 200)
+            return jsonify(msg="User does not exist."), 200
         user.execute()
         return jsonify(msg="User deleted successfully."), 200
