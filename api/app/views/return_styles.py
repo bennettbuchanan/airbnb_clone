@@ -4,7 +4,7 @@ from flask import request
 class ListStyle(object):
     @staticmethod
     def list(select, request):
-        '''Returns a styled list from the data passed in select. The pagination
+        '''Returns a styled list from the data passed. The pagination style
         is defined in the request data. The default values of `number` and
         `page` will be 10 and 1, respectively. If these parameters are passed
         as data in the request, then the values will be updated accordingly.
@@ -19,7 +19,7 @@ class ListStyle(object):
         for key in request.values:
             if key == 'number':
                 number = int(request.values.get('number'))
-            if key == 'page':
+            elif key == 'page':
                 page = int(request.values.get('page'))
 
         '''Call peewee paginate method on the query.'''

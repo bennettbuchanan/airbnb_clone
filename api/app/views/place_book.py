@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from app.models.place_book import PlaceBook
 from app import app
 import time
+from datetime import datetime, timedelta
 
 
 @app.route('/places/<int:place_id>/books', methods=['GET', 'POST'])
@@ -21,6 +22,28 @@ def handle_books(place_id):
         return jsonify(arr), 200
 
     elif request.method == 'POST':
+        try:
+            datetime.strptime(request.form['date_start'], "%Y/%m/%d %H:%M:%S")
+        except ValueError:
+            return jsonify(msg="Incorrect time format: should be " +
+                           "yyyy/MM/dd HH:mm:ss"), 409
+
+        '''Convert the date_start into a date without time.'''
+        book_inquiry = datetime.strptime(request.form['date_start'],
+                                         "%Y/%m/%d %H:%M:%S").date()
+
+        arr = []
+        for place_book in (PlaceBook
+                           .select()
+                           .where(PlaceBook.place == place_id)
+                           .iterator()):
+            start = place_book.date_start.date()
+            end = start + timedelta(days=place_book.number_nights)
+
+            '''Check to see if book_inquiry date is not taken.'''
+            if book_inquiry >= start and book_inquiry < end:
+                return jsonify(available=False), 200
+
         params = request.values
         book = PlaceBook()
 
@@ -30,13 +53,6 @@ def handle_books(place_id):
             return jsonify(msg="Missing parameter."), 400
 
         for key in params:
-            if key == 'date_start':
-                try:
-                    time.strptime(params.get(key), "%Y/%m/%d %H:%M:%S")
-                    setattr(book, key, params.get(key))
-                except ValueError:
-                    return jsonify(msg="Incorrect time format: should be " +
-                                   "yyyy/MM/dd HH:mm:ss"), 409
             if key == 'updated_at' or key == 'created_at':
                 continue
             setattr(book, key, params.get(key))
