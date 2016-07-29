@@ -36,7 +36,7 @@ class BaseModel(Model):
         self.updated_at = datetime.now()
         Model.save(self)
 
-    def base_to_hash(self):
+    def base_to_dict(self):
         '''Stores the BaseModel data in a hash to be used with other model's
         data.
         '''

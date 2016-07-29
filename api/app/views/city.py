@@ -16,7 +16,7 @@ def handle_city(state_id):
     if request.method == 'GET':
         arr = []
         for city in City.select().where(City.state == state_id):
-            arr.append(city.to_hash())
+            arr.append(city.to_dict())
         return jsonify(arr), 200
 
     elif request.method == 'POST':
@@ -32,7 +32,7 @@ def handle_city(state_id):
             if required is False:
                 return jsonify(msg="Missing parameter."), 400
             city = City.create(name=request.form['name'], state=state_id)
-            return jsonify(city.to_hash()), 200
+            return jsonify(city.to_dict()), 200
 
 
 @app.route('/states/<int:state_id>/cities/<int:city_id>',
@@ -54,7 +54,7 @@ def handle_city_id(state_id, city_id):
         raise jsonify(msg="There is no city with this id in this state."), 400
 
     if request.method == 'GET':
-        return jsonify(city.to_hash())
+        return jsonify(city.to_dict())
 
     elif request.method == 'DELETE':
         try:

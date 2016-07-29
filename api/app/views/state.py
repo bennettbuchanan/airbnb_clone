@@ -14,7 +14,7 @@ def handle_states():
     if request.method == 'GET':
         arr = []
         for state in State.select():
-            arr.append(state.to_hash())
+            arr.append(state.to_dict())
         return jsonify(arr), 200
 
     elif request.method == 'POST':
@@ -30,7 +30,7 @@ def handle_states():
             return jsonify(code=10001, msg="State already exists"), 409
         except State.DoesNotExist:
             state = State.create(name=request.form['name'])
-            return jsonify(state.to_hash()), 201
+            return jsonify(state.to_dict()), 201
 
 
 @app.route('/states/<int:state_id>', methods=['GET', 'DELETE'])
@@ -50,7 +50,7 @@ def handle_state_id(state_id):
         return jsonify(msg="There is no state with this id."), 404
 
     if request.method == 'GET':
-        return jsonify(state.to_hash()), 200
+        return jsonify(state.to_dict()), 200
 
     elif request.method == 'DELETE':
         try:

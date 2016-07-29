@@ -25,7 +25,7 @@ class User(BaseModel):
         '''
         self.password = md5.new(clear_password).digest()
 
-    def to_hash(self):
+    def to_dict(self):
         '''Returns the BaseModel data, along with this model model's data as a
         hash.
         '''
@@ -33,4 +33,4 @@ class User(BaseModel):
         data['email'] = self.email
         data['first_name'] = self.first_name
         data['last_name'] = self.last_name
-        return dict(self.base_to_hash().items() + data.items())
+        return dict(self.base_to_dict().items() + data.items())

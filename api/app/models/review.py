@@ -14,7 +14,7 @@ class Review(BaseModel):
     stars = IntegerField(default=0)
     user = ForeignKeyField(User, related_name="reviews", on_delete='CASCADE')
 
-    def to_hash(self):
+    def to_dict(self):
         '''Returns the BaseModel data, along with this model model's data as a
         hash. Circular imports need to be within the method scope. Query the
         tables to return the id of the user or place for which the review is
@@ -44,4 +44,4 @@ class Review(BaseModel):
         except ReviewPlace.DoesNotExist:
             data['toplaceid'] = None
 
-        return dict(self.base_to_hash().items() + data.items())
+        return dict(self.base_to_dict().items() + data.items())

@@ -12,7 +12,7 @@ def handle_reviews(user_id):
     '''Returns the reviews of the user passed the argument `user_id`. This is
     accomplished through querying the ReviewUser table, and returning rows in
     which `user_id` is equal to the id of a user. Then, using the
-    ForeignKeyField, retrieve those particular reviews with the to_hash()
+    ForeignKeyField, retrieve those particular reviews with the to_dict()
     method. Will not add attributes `updated_at` or `created_at`. Note: this
     route is for reviewing the user with id `user_id`. The user id passed as
     a parameter with a POST request is the user making the review.
@@ -30,7 +30,7 @@ def handle_reviews(user_id):
         for review_user in (ReviewUser
                             .select()
                             .where(ReviewUser.user == user_id)):
-            arr.append(review_user.review.to_hash())
+            arr.append(review_user.review.to_dict())
         return jsonify(arr), 200
 
     elif request.method == 'POST':
@@ -55,7 +55,7 @@ def handle_reviews(user_id):
         '''Save the connection in the ReviewUser table.'''
         ReviewUser().create(user=user_id, review=review.id)
 
-        return jsonify(review.to_hash()), 201
+        return jsonify(review.to_dict()), 201
 
 
 @app.route('/users/<int:user_id>/my_reviews', methods=['GET'])
@@ -69,7 +69,7 @@ def handle_my_reviews(user_id):
     if request.method == 'GET':
         arr = []
         for review in Review.select().where(Review.user == user_id):
-            arr.append(review.to_hash())
+            arr.append(review.to_dict())
         return jsonify(arr), 200
 
 
@@ -90,7 +90,7 @@ def handle_review_id(user_id, review_id):
         return jsonify(msg="Review does not exist."), 404
 
     if request.method == 'GET':
-        return jsonify([this_review.review.to_hash()]), 200
+        return jsonify([this_review.review.to_dict()]), 200
 
     elif request.method == 'DELETE':
         ReviewUser.delete().where((ReviewUser.user == user_id) &
@@ -120,7 +120,7 @@ def handle_place_reviews(place_id):
         for review_place in (ReviewPlace
                              .select()
                              .where(ReviewPlace.place == place_id)):
-            arr.append(review_place.review.to_hash())
+            arr.append(review_place.review.to_dict())
         return jsonify(arr), 200
 
     elif request.method == 'POST':
@@ -142,7 +142,7 @@ def handle_place_reviews(place_id):
         '''Save the connection in the ReviewPlace table.'''
         ReviewPlace().create(place=place_id, review=review.id)
 
-        return jsonify(review.to_hash()), 201
+        return jsonify(review.to_dict()), 201
 
 
 @app.route('/places/<int:place_id>/reviews/<int:review_id>',
@@ -162,7 +162,7 @@ def handle_place_review(place_id, review_id):
         return jsonify(msg="Review does not exist."), 404
 
     if request.method == 'GET':
-        return jsonify([this_review.review.to_hash()]), 200
+        return jsonify([this_review.review.to_dict()]), 200
 
     elif request.method == 'DELETE':
         ReviewPlace.delete().where((ReviewPlace.place == place_id) &

@@ -35,7 +35,7 @@ def handle_users():
                     continue
                 setattr(user, key, params.get(key))
             user.save()
-            return jsonify(user.to_hash()), 201
+            return jsonify(user.to_dict()), 201
 
 
 @app.route('/users/<int:user_id>', methods=['GET', 'PUT', 'DELETE'])
@@ -57,7 +57,7 @@ def handle_user_id(user_id):
         return jsonify(msg="User does not exist."), 404
 
     if request.method == 'GET':
-        return jsonify(user.to_hash()), 200
+        return jsonify(user.to_dict()), 200
 
     elif request.method == 'PUT':
         params = request.values

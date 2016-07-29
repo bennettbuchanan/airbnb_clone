@@ -18,7 +18,7 @@ def handle_books(place_id):
         for book in (PlaceBook
                      .select()
                      .where(PlaceBook.place == place_id)):
-            arr.append(book.to_hash())
+            arr.append(book.to_dict())
         return jsonify(arr), 200
 
     elif request.method == 'POST':
@@ -58,7 +58,7 @@ def handle_books(place_id):
             setattr(book, key, params.get(key))
         book.place = place_id
         book.save()
-        return jsonify(book.to_hash()), 200
+        return jsonify(book.to_dict()), 200
 
 
 @app.route('/places/<int:place_id>/books/<int:book_id>',
@@ -78,7 +78,7 @@ def handle_books_id(place_id, book_id):
         raise Exception("There is no placebook with this id.")
 
     if request.method == 'GET':
-        return jsonify(book.to_hash()), 200
+        return jsonify(book.to_dict()), 200
 
     elif request.method == 'PUT':
         params = request.values

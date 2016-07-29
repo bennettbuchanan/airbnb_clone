@@ -13,7 +13,7 @@ def handle_amenity():
     if request.method == 'GET':
         arr = []
         for amenity in Amenity.select():
-            arr.append(amenity.to_hash())
+            arr.append(amenity.to_dict())
         return jsonify(arr), 200
 
     elif request.method == 'POST':
@@ -27,7 +27,7 @@ def handle_amenity():
                 return jsonify(msg="Missing parameter."), 400
 
             amenity = Amenity.create(name=request.form['name'])
-            return jsonify(amenity.to_hash()), 200
+            return jsonify(amenity.to_dict()), 200
 
 
 @app.route('/amenities/<int:amenity_id>', methods=['GET', 'DELETE'])
@@ -44,7 +44,7 @@ def handle_amenity_id(amenity_id):
         raise Exception("There is no amenity with this id.")
 
     if request.method == 'GET':
-        return jsonify(amenity.to_hash()), 200
+        return jsonify(amenity.to_dict()), 200
 
     elif request.method == 'DELETE':
         amenity = Amenity.delete().where(Amenity.id == amenity_id)
@@ -70,7 +70,7 @@ def handle_place_id_amenity(place_id):
         for this in (PlaceAmenities
                      .select()
                      .where(PlaceAmenities.place == place_id)):
-            arr.append(this.amenity.to_hash())
+            arr.append(this.amenity.to_dict())
 
         return jsonify(arr), 200
 

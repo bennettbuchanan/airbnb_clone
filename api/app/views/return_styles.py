@@ -25,7 +25,7 @@ class ListStyle(object):
         '''Call peewee paginate method on the query.'''
         arr = []
         for i in select.paginate(page, number):
-            arr.append(i.to_hash())
+            arr.append(i.to_dict())
 
         '''By default, `next_page_path` and `prev_page_path` are None.'''
         next_page_path = None

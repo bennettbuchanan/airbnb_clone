@@ -15,7 +15,7 @@ class PlaceBook(BaseModel):
     date_start = DateTimeField(null=False)
     number_nights = IntegerField(default=1)
 
-    def to_hash(self):
+    def to_dict(self):
         '''Returns the BaseModel data, along with this model model's data as a
         hash.
         '''
@@ -37,4 +37,4 @@ class PlaceBook(BaseModel):
         else:
             data['date_start'] = self.date_start.strftime("%Y/%m/%d %H:%M:%S")
         data['number_nights'] = self.number_nights
-        return dict(self.base_to_hash().items() + data.items())
+        return dict(self.base_to_dict().items() + data.items())

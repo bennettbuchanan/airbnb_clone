@@ -17,7 +17,7 @@ def handle_places():
     if request.method == 'GET':
         arr = []
         for place in Place.select():
-            arr.append(place.to_hash())
+            arr.append(place.to_dict())
         return jsonify(arr), 200
 
     elif request.method == 'POST':
@@ -34,7 +34,7 @@ def handle_places():
                 continue
             setattr(place, key, params.get(key))
         place.save()
-        return jsonify(place.to_hash()), 200
+        return jsonify(place.to_dict()), 200
 
 
 @app.route('/places/<int:place_id>', methods=['GET', 'PUT', 'DELETE'])
@@ -55,7 +55,7 @@ def handle_place_id(place_id):
         raise Exception("There is no place with this id.")
 
     if request.method == 'GET':
-        return jsonify(place.to_hash()), 200
+        return jsonify(place.to_dict()), 200
 
     elif request.method == 'PUT':
         params = request.values
@@ -134,7 +134,7 @@ def handle_place_state_id(state_id):
         arr = []
         for place in Place.select().iterator():
             if place.city.state.id == state_id:
-                arr.append(place.to_hash())
+                arr.append(place.to_dict())
 
         if len(arr) == 0:
             return jsonify(msg="There is no place in this state."), 400
@@ -163,7 +163,7 @@ def handle_place_city_id(state_id, city_id):
 
         arr = []
         for place in Place.select().where(Place.city == city_id):
-            arr.append(place.to_hash())
+            arr.append(place.to_dict())
         return jsonify(arr), 200
 
     elif request.method == 'POST':
@@ -182,4 +182,4 @@ def handle_place_city_id(state_id, city_id):
 
         place.city = city_id
         place.save()
-        return jsonify(place.to_hash()), 200
+        return jsonify(place.to_dict()), 200
