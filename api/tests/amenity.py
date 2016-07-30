@@ -75,20 +75,22 @@ class FlaskTestCase(unittest.TestCase):
         '''The dictionary creates and returns objects with the correct ids.'''
         for i in range(3, 5):
             res = self.create_amenity('/amenities', 'test_' + str(i))
-            self.assertEqual(json.loads(res.data).get('id'), i)
+            self.assertEqual(json.loads(res.data)['id'], i)
 
         res = self.app.get('/amenities')
-        self.assertEqual(len(json.loads(res.data)), 4)
+        self.assertEqual(len(json.loads(res.data)[0]['data']), 4)
+        res = self.app.get('/amenities?page=2&number=1')
+        self.assertEqual(len(json.loads(res.data)[0]['data']), 1)
         res = self.create_amenity('/amenities', "test_4")
 
-        '''Do not allow a user to update the name.'''
+        '''Do not allow a user to use a prexisting amenity name.'''
         self.assertEqual(res.status_code, 409)
-        self.assertEqual(json.loads(res.data).get('code'), 10003)
+        self.assertEqual(json.loads(res.data)['code'], 10003)
 
     def test_get_id(self):
         '''Test that the object's returned id is correct.'''
         res = self.app.get('/amenities/2')
-        self.assertEqual(json.loads(res.data).get("id"), 2)
+        self.assertEqual(json.loads(res.data)['id'], 2)
 
     def test_delete(self):
         '''Delete amenity with the id 1.'''
@@ -96,33 +98,36 @@ class FlaskTestCase(unittest.TestCase):
 
         '''There is only one remaining booking in the table, that with id 2.'''
         res = self.app.get('/amenities')
-        self.assertEqual(len(json.loads(res.data)), 1)
-        self.assertEqual(json.loads(res.data)[0].get('id'), 2)
+        self.assertEqual(len(json.loads(res.data)[0]['data']), 1)
+        self.assertEqual(json.loads(res.data)[0]['data'][0]['id'], 2)
 
     def test_amenity_create_and_delete(self):
         '''Add the amenity with id 1 to belong to place with id of 1. Test that
-        it can be retrieved with a GET request on the same place's id.'''
-        res = self.app.post('/places/1/amenities/1')
+        it can be retrieved with a GET request on the same place's id.
+        '''
+        self.app.post('/places/1/amenities/1')
         res = self.app.post('/places/1/amenities/2')
         self.assertEqual(res.status_code, 201)
         res = self.app.get('/places/1/amenities')
-        self.assertEqual(json.loads(res.data)[0].get('name'), 'test_1')
-        self.assertEqual(len(json.loads(res.data)), 2)
+        self.assertEqual(json.loads(res.data)[0]['data'][0]['name'], 'test_1')
+        self.assertEqual(len(json.loads(res.data)[0]['data']), 2)
 
         '''A POST request of a non existant amenity or place returns 404
-        status.'''
+        status.
+        '''
         res = self.app.post('/places/1/amenities/3')
         self.assertEqual(res.status_code, 404)
         res = self.app.post('/places/2/amenities/1')
         self.assertEqual(res.status_code, 404)
 
         '''Delete amenity with id 1. There should be only one amenity for this
-        place returned now.'''
+        place returned now.
+        '''
         res = self.app.delete('/places/1/amenities/1')
         self.assertEqual(res.status_code, 200)
         res = self.app.get('/places/1/amenities')
-        self.assertEqual(json.loads(res.data)[0].get('name'), 'test_2')
-        self.assertEqual(len(json.loads(res.data)), 1)
+        self.assertEqual(json.loads(res.data)[0]['data'][0]['name'], 'test_2')
+        self.assertEqual(len(json.loads(res.data)[0]['data']), 1)
 
     def test_lacking_param(self):
         lacking_name_param = self.app.post('/amenities', data=dict(id=2))

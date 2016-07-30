@@ -85,9 +85,9 @@ class FlaskTestCase(unittest.TestCase):
         '''Create the review corretly when all parameters are passed.'''
         for i in range(1, 3):
             res = self.create_review('/users/1/reviews', 'test', 2)
-            self.assertEqual(json.loads(res.data).get('touserid'), 1)
-            self.assertEqual(json.loads(res.data).get('fromuserid'), 2)
-            self.assertEqual(json.loads(res.data).get('id'), i)
+            self.assertEqual(json.loads(res.data)['touserid'], 1)
+            self.assertEqual(json.loads(res.data)['fromuserid'], 2)
+            self.assertEqual(json.loads(res.data)['id'], i)
 
         '''Test for a cases where required parameters are missing or improper
         types are passed as parameter (e.g., a string instead of an int).'''
@@ -109,9 +109,9 @@ class FlaskTestCase(unittest.TestCase):
 
         '''This should return the review for the respective users.'''
         res = self.app.get('/users/1/reviews/1')
-        self.assertEqual(json.loads(res.data)[0].get('message'), 'test_1')
+        self.assertEqual(json.loads(res.data)[0]['message'], 'test_1')
         res = self.app.get('/users/1/reviews/2')
-        self.assertEqual(json.loads(res.data)[0].get('message'), 'test_2')
+        self.assertEqual(json.loads(res.data)[0]['message'], 'test_2')
 
         '''Test cases where the user or review ids do not exist.'''
         res = self.app.get('/users/3/reviews/1')
@@ -187,7 +187,7 @@ class FlaskTestCase(unittest.TestCase):
         self.create_review('/places/1/reviews', 'test', 2)
         res = self.app.get('/places/1/reviews/1')
         self.assertEqual(len(json.loads(res.data)), 1)
-        self.assertEqual(json.loads(res.data)[0].get('id'), 1)
+        self.assertEqual(json.loads(res.data)[0]['id'], 1)
 
     def test_delete_place_review(self):
         '''A non existant review id returns 404 status.'''

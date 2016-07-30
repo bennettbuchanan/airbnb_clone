@@ -1,8 +1,8 @@
-from flask import Flask, request, jsonify
-from app.models.place_book import PlaceBook
-from app import app
-import time
+from flask import request, jsonify
 from datetime import datetime, timedelta
+from app.models.place_book import PlaceBook
+from return_styles import ListStyle
+from app import app
 
 
 @app.route('/places/<int:place_id>/books', methods=['GET', 'POST'])
@@ -14,12 +14,11 @@ def handle_books(place_id):
     place_id: The id of the place with the booking.
     '''
     if request.method == 'GET':
-        arr = []
-        for book in (PlaceBook
-                     .select()
-                     .where(PlaceBook.place == place_id)):
-            arr.append(book.to_dict())
-        return jsonify(arr), 200
+        list = ListStyle().list((PlaceBook
+                                 .select()
+                                 .where(PlaceBook.place == place_id)),
+                                request)
+        return jsonify(list), 200
 
     elif request.method == 'POST':
         try:

@@ -1,9 +1,11 @@
-from flask import Flask, request, jsonify
+from flask import request, jsonify
+from datetime import datetime, timedelta
 from app.models.place import Place
 from app.models.place_book import PlaceBook
 from app.models.state import State
+from app.models.city import City
+from return_styles import ListStyle
 from app import app
-from datetime import datetime, timedelta
 
 
 @app.route('/places', methods=['GET', 'POST'])
@@ -15,10 +17,8 @@ def handle_places():
     as `updated_at` or `created_at`.
     '''
     if request.method == 'GET':
-        arr = []
-        for place in Place.select():
-            arr.append(place.to_dict())
-        return jsonify(arr), 200
+        list = ListStyle().list(Place.select(), request)
+        return jsonify(list), 200
 
     elif request.method == 'POST':
         params = request.values
@@ -131,15 +131,13 @@ def handle_place_state_id(state_id):
         except State.DoesNotExist:
             return jsonify("No state exists with this id."), 400
 
-        arr = []
-        for place in Place.select().iterator():
-            if place.city.state.id == state_id:
-                arr.append(place.to_dict())
+        list = ListStyle().list((Place
+                                .select()
+                                .join(City)
+                                .join(State)
+                                .where(State.id == state_id)), request)
 
-        if len(arr) == 0:
-            return jsonify(msg="There is no place in this state."), 400
-
-        return jsonify(arr), 200
+        return jsonify(list), 200
 
 
 @app.route('/states/<int:state_id>/cities/<int:city_id>/places',

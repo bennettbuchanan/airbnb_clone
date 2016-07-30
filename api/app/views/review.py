@@ -1,9 +1,10 @@
-from flask import Flask, request, jsonify
+from flask import request, jsonify
 from app.models.user import User
 from app.models.review import Review
 from app.models.place import Place
 from app.models.review_user import ReviewUser
 from app.models.review_place import ReviewPlace
+from return_styles import ListStyle
 from app import app
 
 

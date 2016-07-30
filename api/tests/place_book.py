@@ -80,17 +80,17 @@ class FlaskTestCase(unittest.TestCase):
                                     'test_1')
 
         '''The dictionary returns an object with the correct id.'''
-        self.assertEqual(json.loads(res.data).get('id'), 1)
+        self.assertEqual(json.loads(res.data)['id'], 1)
 
         res = self.create_placebook('/places/1/books',
                                     "2000/01/01 00:00:00",
                                     'test_1')
 
         '''Returns an object indicating booking unavailable.'''
-        self.assertEqual(json.loads(res.data).get('available'), False)
+        self.assertEqual(json.loads(res.data)['available'], False)
 
         res = self.app.get('/places/1/books')
-        self.assertEqual(len(json.loads(res.data)), 1)
+        self.assertEqual(json.loads(res.data)[0]['data'][0]['id'], 1)
 
         '''date_start field must take the form "%Y/%m/%d %H:%M:%S", test
         for this case by giving it an incorrect format (year comes after day
@@ -111,10 +111,10 @@ class FlaskTestCase(unittest.TestCase):
                                         'test_1')
 
             '''The dictionary returns an object with the correct id.'''
-            self.assertEqual(json.loads(res.data).get('id'), i)
+            self.assertEqual(json.loads(res.data)['id'], i)
 
         res = self.app.get('/places/1/books/2')
-        self.assertEqual(json.loads(res.data).get("id"), 2)
+        self.assertEqual(json.loads(res.data)['id'], 2)
 
         res = self.app.put('/places/1/books/2', data=dict(is_validated=True,))
 
@@ -138,8 +138,8 @@ class FlaskTestCase(unittest.TestCase):
 
         '''There is only one remaining booking in the table, that with id 2.'''
         res = self.app.get('/places/1/books')
-        self.assertEqual(len(json.loads(res.data)), 1)
-        self.assertEqual(json.loads(res.data)[0].get('id'), 2)
+        self.assertEqual(len(json.loads(res.data)[0]['data']), 1)
+        self.assertEqual(json.loads(res.data)[0]['data'][0]['id'], 2)
 
 
 if __name__ == '__main__':

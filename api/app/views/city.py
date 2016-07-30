@@ -1,6 +1,7 @@
-from flask import Flask, request, jsonify
+from flask import request, jsonify
 from app.models.state import State
 from app.models.city import City
+from return_styles import ListStyle
 from app import app
 
 
@@ -14,10 +15,11 @@ def handle_city(state_id):
     http://docs.peewee-orm.com/en/latest/peewee/api.html#SelectQuery.get
     '''
     if request.method == 'GET':
-        arr = []
-        for city in City.select().where(City.state == state_id):
-            arr.append(city.to_dict())
-        return jsonify(arr), 200
+        list = ListStyle().list((City
+                                 .select()
+                                 .where(City.state == state_id)),
+                                request)
+        return jsonify(list), 200
 
     elif request.method == 'POST':
         try:

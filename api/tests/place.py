@@ -79,17 +79,17 @@ class FlaskTestCase(unittest.TestCase):
         '''The dictionary returns an object with the correct id.'''
         for i in range(3, 5):
             res = self.create_place('/places', 'test_' + str(i))
-            self.assertEqual(json.loads(res.data).get('id'), i)
+            self.assertEqual(json.loads(res.data)['id'], i)
 
     def test_create_id(self):
         '''The dictionary returns an object with the correct id.'''
         res = self.app.get('/places/2')
-        self.assertEqual(json.loads(res.data).get('id'), 2)
+        self.assertEqual(json.loads(res.data)['id'], 2)
 
         '''Update the id of the item.'''
         self.app.put('/places/2', data=dict(name='updated_data'))
         res = self.app.get('/places/2')
-        self.assertEqual(json.loads(res.data).get('name'), 'updated_data')
+        self.assertEqual(json.loads(res.data)['name'], 'updated_data')
 
         '''You may not update the owner.'''
         res = self.app.put('/places/1', data=dict(owner="test"))
@@ -105,14 +105,14 @@ class FlaskTestCase(unittest.TestCase):
 
         '''There is only one remaining place in the table, that with id 1.'''
         res = self.app.get('/places')
-        self.assertEqual(len(json.loads(res.data)), 1)
-        self.assertEqual(json.loads(res.data)[0].get('id'), 1)
+        self.assertEqual(len(json.loads(res.data)[0]['data']), 1)
+        self.assertEqual(json.loads(res.data)[0]['data'][0]['id'], 1)
 
     def test_get_places_by_state(self):
         '''Test retrieval of places belonging to a state.'''
         res = self.app.get('/states/1/places')
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(len(json.loads(res.data)), 2)
+        self.assertEqual(len(json.loads(res.data)[0]['data']), 2)
 
         '''There is no state with this id. Return 400 status code.'''
         res = self.app.get('/states/2/places')

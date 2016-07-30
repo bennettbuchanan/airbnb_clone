@@ -38,7 +38,7 @@ class FlaskTestCase(unittest.TestCase):
         '''The dictionary returns an object with the correct id.'''
         for i in range(1, 3):
             res = self.create_state("test_" + str(i))
-            self.assertEqual(json.loads(res.data).get("id"), i)
+            self.assertEqual(json.loads(res.data)['id'], i)
 
         lacking_param = self.app.post('/states', data=dict(bad_param="test"))
         non_unique_name = self.create_state("test_2")
@@ -48,12 +48,12 @@ class FlaskTestCase(unittest.TestCase):
 
     def test_list(self):
         res = self.app.get('/states')
-        self.assertEqual(len(json.loads(res.data)), 0)
+        self.assertEqual(len(json.loads(res.data)[0]['data']), 0)
 
         '''Add one state to databse.'''
         self.create_state("test")
         res = self.app.get('/states')
-        self.assertEqual(len(json.loads(res.data)), 1)
+        self.assertEqual(len(json.loads(res.data)[0]['data']), 1)
 
     def test_delete(self):
         '''Create a new state, confirm 201 status code.'''
@@ -62,12 +62,12 @@ class FlaskTestCase(unittest.TestCase):
 
         '''Check that there is one state in the table.'''
         res = self.app.get('/states')
-        self.assertEqual(len(json.loads(res.data)), 1)
+        self.assertEqual(len(json.loads(res.data)[0]['data']), 1)
 
         '''Delete the state and check that the table is empty.'''
         self.app.delete('/states/1')
         res = self.app.get('/states')
-        self.assertEqual(len(json.loads(res.data)), 0)
+        self.assertEqual(len(json.loads(res.data)[0]['data']), 0)
 
         '''The service returns 404 when attempting to delete a non-existant
         state.

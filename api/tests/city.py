@@ -47,7 +47,7 @@ class FlaskTestCase(unittest.TestCase):
         '''The dictionary returns an object with the correct id.'''
         for i in range(3, 5):
             res = self.create_city("test_" + str(i))
-            self.assertEqual(json.loads(res.data).get("id"), i)
+            self.assertEqual(json.loads(res.data)['id'], i)
 
         lacking_param = self.app.post('/states/1/cities',
                                       data=dict(bad_param="test"))
@@ -57,21 +57,23 @@ class FlaskTestCase(unittest.TestCase):
         self.assertEqual(non_unique_name.status_code, 409)
 
         '''Returned object has the code 10002.'''
-        self.assertEqual(json.loads(non_unique_name.data).get("code"), 10002)
+        self.assertEqual(json.loads(non_unique_name.data)['code'], 10002)
+
+        res = self.app.get('/states/1/cities')
 
     def test_list(self):
         '''Add one city to database.'''
         res = self.app.get('/states/1/cities')
-        self.assertEqual(len(json.loads(res.data)), 2)
+        self.assertEqual(len(json.loads(res.data)[0]['data']), 2)
 
         res = self.create_city("test")
         res = self.app.get('/states/1/cities')
-        self.assertEqual(len(json.loads(res.data)), 3)
+        self.assertEqual(len(json.loads(res.data)[0]['data']), 3)
 
     def test_create_with_id(self):
         '''The application returns an object with the correct id.'''
         res = self.app.get('/states/1/cities/2')
-        self.assertEqual(json.loads(res.data).get("id"), 2)
+        self.assertEqual(json.loads(res.data)['id'], 2)
 
     def test_delete(self):
         '''The application deletes an object with the correct id.'''
@@ -80,7 +82,8 @@ class FlaskTestCase(unittest.TestCase):
 
         '''The remaining city has an id of 2 because 1 has been deleted.'''
         res = self.app.get('/states/1/cities')
-        self.assertEqual(json.loads(res.data)[0].get("id"), 2)
+
+        self.assertEqual(json.loads(res.data)[0]['data'][0]['id'], 2)
 
 if __name__ == '__main__':
     unittest.main()

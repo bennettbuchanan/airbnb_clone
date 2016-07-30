@@ -1,5 +1,6 @@
-from flask import Flask, request, jsonify
+from flask import request, jsonify
 from app.models.state import State
+from return_styles import ListStyle
 from app import app
 
 
@@ -12,10 +13,8 @@ def handle_states():
     http://docs.peewee-orm.com/en/latest/peewee/api.html#SelectQuery.get
     '''
     if request.method == 'GET':
-        arr = []
-        for state in State.select():
-            arr.append(state.to_dict())
-        return jsonify(arr), 200
+        list = ListStyle().list(State.select(), request)
+        return jsonify(list), 200
 
     elif request.method == 'POST':
         params = request.values

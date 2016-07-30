@@ -1,7 +1,8 @@
-from flask import Flask, request, jsonify
+from flask import request, jsonify
 from app.models.amenity import Amenity
 from app.models.place import Place
 from app.models.place_amenity import PlaceAmenities
+from return_styles import ListStyle
 from app import app
 
 
@@ -11,10 +12,8 @@ def handle_amenity():
     Adds an amenity with a POST request.
     '''
     if request.method == 'GET':
-        arr = []
-        for amenity in Amenity.select():
-            arr.append(amenity.to_dict())
-        return jsonify(arr), 200
+        list = ListStyle().list(Amenity.select(), request)
+        return jsonify(list), 200
 
     elif request.method == 'POST':
         try:
@@ -66,13 +65,15 @@ def handle_place_id_amenity(place_id):
         return jsonify(msg="Amenity does not exist."), 404
 
     if request.method == 'GET':
-        arr = []
-        for this in (PlaceAmenities
-                     .select()
-                     .where(PlaceAmenities.place == place_id)):
-            arr.append(this.amenity.to_dict())
+        '''Use a join statement to get the instances in the amenity table.'''
+        list = ListStyle().list((Amenity
+                                 .select()
+                                 .join(PlaceAmenities,
+                                       on=PlaceAmenities.amenity)
+                                 .where(PlaceAmenities.place == place_id)),
+                                request)
 
-        return jsonify(arr), 200
+        return jsonify(list), 200
 
 
 @app.route('/places/<int:place_id>/amenities/<int:amenity_id>',
