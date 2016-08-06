@@ -1,0 +1,17 @@
+<html>
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    </head>
+    <body>
+        <button id="test_cors">Test C.O.R.S.</button>
+        <div id="result_cors"></div>
+
+        <script>
+            $("#test_cors").click(function() {
+                $.get("http://localhost:3333/states/1/cities", function(data) {
+                    $("#result_cors").html(JSON.stringify(data));
+                });
+            });
+        </script>
+    </body>
+</html>
