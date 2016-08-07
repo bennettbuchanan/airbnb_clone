@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask
 from flask_json import FlaskJSON
 from flask_cors import CORS, cross_origin
 import os
