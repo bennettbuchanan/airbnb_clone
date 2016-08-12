@@ -3,3 +3,4 @@ mysql-python
 flask
 Flask-JSON
 flask-cors
+PyMySQL
