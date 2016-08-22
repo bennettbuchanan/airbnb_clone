@@ -1,2 +1,7 @@
+*~
+\#*\#
+.\#*
 *.pyc
 *.db
+node_modules
+
