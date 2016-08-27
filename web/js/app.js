@@ -1,12 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Header from '../Components/Header.js';
-import LeftColumn from '../Components/LeftColumn.js'
+import LeftColumn from '../Components/LeftColumn.js';
+import Footer from '../Components/Footer.js';
+import Content from '../Components/Content.js';
+import ContentWrapper from '../Components/ContentWrapper.js';
+import OuterWrapper from '../Components/OuterWrapper.js';
 
 ReactDOM.render(
-        <Header
-    imagePath={'../assets/images/airbnb_logo.png'}
+    <OuterWrapper
         />,
 
-    document.getElementById('header')
+    document.getElementById('test')
 );
