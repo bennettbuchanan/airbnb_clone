@@ -1,8 +1,6 @@
 import React from 'react';
 import LeftColumn from './LeftColumn.js';
 import Content from './Content.js';
-import Header from './Header.js';
-import Footer from './Footer.js';
 
 const styles = {
     contentWrapper: {
@@ -15,7 +13,7 @@ const styles = {
 
 const ContentWrapper = (props) => (
         <div style={styles.contentWrapper}>
-        <LeftColumn/>
+        <LeftColumn url="http://localhost:3333/states"/>
         <Content/>
         </div>
 );

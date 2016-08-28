@@ -4,7 +4,9 @@ const styles = {
     content: {
         width: '100%',
         marginRight: '200px',
-        backgroundColor: '#9ACD32',
+        backgroundColor: '#FFFFFF',
+        borderLeft: '1px solid black',
+        borderRight: '1px solid black'
     }
 }
 

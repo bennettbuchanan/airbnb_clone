@@ -4,8 +4,8 @@ const styles = {
     header: {
         marginRight: '200px',
         height: '60px',
-        background: 'grey',
-        // position: 'absolute'
+        background: '#FFFFFF',
+        borderBottom: '1px solid black'
     },
     logo: {
         height: '60px',
