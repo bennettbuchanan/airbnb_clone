@@ -9,3 +9,10 @@ body {
 #react_components {
     height: 100%;
 }
+
+/* Handle state left column formatting. */
+.checkbox label {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
