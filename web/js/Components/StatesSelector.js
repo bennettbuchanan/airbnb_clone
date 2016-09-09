@@ -14,7 +14,6 @@ var StatesSelector = React.createClass({
     render: function() {
 
         if (this.props.stateData != undefined) {
-            // console.log(this.props.stateData);
             return (
                     <div style={styles.statesSelector}>
                     <h1>States</h1>
